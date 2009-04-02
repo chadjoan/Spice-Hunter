@@ -1,0 +1,21 @@
+This file is about how to build a3.  
+For more information about a3 itself, run a3 or
+look at the usage information at the bottom of a3.d.  
+
+a3 is written in the D programming language.
+
+To build a3, a D compiler is required.  
+Such a compiler can be found for both Windows and Linux here:
+http://www.digitalmars.com/d/dcompiler.html
+
+Another D compiler which supports more targets but is 
+harder to install can be found here:
+http://dgcc.sourceforge.net/
+
+
+
+Assuming you use DMD (the first one), your session will look like this:
+dmd a3.d -o-
+
+... and out pops a3.exe.  Then you use a3.exe to do whatever.
+You're done.  That's it.  

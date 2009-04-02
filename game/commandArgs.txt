@@ -1,0 +1,1 @@
+(fcsh) mxmlc src\stable\SpiceHunter.as -default-frame-rate=200 -debug=true -default-size 800 600

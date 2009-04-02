@@ -1,0 +1,8 @@
+knee = 20;
+range = 0:400;
+sigma = 10;
+
+f = 1 ./ (1+exp((-range+knee)/knee) );
+
+plot (range,f);
+

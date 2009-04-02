@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="iso-8859-1"?>
+
+<rom gameUrl="spiceHunter.html" previewUrl="title.swf">
+	<title>Spice Hunter</title>
+	<author linkUrl="http://accad.osu.edu/arcade/teams/2007.html#spiceHunter">Hanning Chen, Ryan A. Chilton, Danny Guinn, Chad Joan, Jimmy Lei, James Pae</author>
+	<description>Use gravity beams and your tether to tow, fling, or bump spice back to your base.</description>
+	<genre>
+		<keyword>gravity</keyword>
+		<keyword>competition</keyword>
+		<keyword>vectors</keyword>
+	</genre>
+	<players min="1" max="4" simultaneous="true" multiuser="false" />
+	<rating type="E">everyone</rating>
+	<release month="6" day="5" year="2007" />
+</rom>
