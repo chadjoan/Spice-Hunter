@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<configuration>
+
+
+	<!-- trace logging on when true -->
+	<logging enabled="true" />
+
+	<!-- rom to load -->
+	<rom file="SpiceHunter.swf" />
+
+	<!-- key mappings, player numbers start at 1 -->
+	<keymappings>
+		<joystick playerNumber="1">
+			<hatUp    keyCode="38" /><!-- Arrow Up -->
+			<hatRight keyCode="39" /><!-- Arrow Right -->
+			<hatDown  keyCode="40" /><!-- Arrow Down -->
+			<hatLeft  keyCode="37" /><!-- Arrow Left -->
+			<buttonX  keyCode="90" /><!-- Z -->
+			<buttonA  keyCode="88" /><!-- X -->
+			<buttonB  keyCode="67" /><!-- C -->
+			<buttonC  keyCode="86" /><!-- V -->
+		</joystick>
+		<joystick playerNumber="2">
+			<hatUp    keyCode="48"  /><!-- 0 -->
+			<hatRight keyCode="219" /><!-- [ -->
+			<hatDown  keyCode="80"  /><!-- P -->
+			<hatLeft  keyCode="79"  /><!-- O -->
+			<buttonX  keyCode="81" /><!-- Q -->
+			<buttonA  keyCode="87" /><!-- W -->
+			<buttonB  keyCode="69" /><!-- E -->
+			<buttonC  keyCode="82" /><!-- R -->
+		</joystick>
+		<joystick playerNumber="3">
+			<!-- Be sure to play with numlock ON. -->
+			<hatUp    keyCode="104" /><!-- Numpad Up -->
+			<hatRight keyCode="102" /><!-- Numpad Right -->
+			<hatDown  keyCode="101" /><!-- Numpad Center -->
+			<hatLeft  keyCode="100" /><!-- Numpad Left -->
+			<buttonX  keyCode="65" /><!-- A -->
+			<buttonA  keyCode="83" /><!-- S -->
+			<buttonB  keyCode="68" /><!-- D -->
+			<buttonC  keyCode="70" /><!-- F -->
+		</joystick>
+		<joystick playerNumber="4">
+			<!-- Be sure to play with numlock ON. -->
+			<hatUp    keyCode="73" /><!-- I -->
+			<hatRight keyCode="76" /><!-- L -->
+			<hatDown  keyCode="75" /><!-- K -->
+			<hatLeft  keyCode="74" /><!-- J -->
+			<buttonX  keyCode="97" /><!-- Numpad 1 -->
+			<buttonA  keyCode="98" /><!-- Numpad 2 (down) -->
+			<buttonB  keyCode="99" /><!-- Numpad 3 -->
+			<buttonC  keyCode="13" /><!-- Numpad Enter (Same as normal enter) -->
+		</joystick>
+	</keymappings>
+
+
+</configuration>

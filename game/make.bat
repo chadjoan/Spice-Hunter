@@ -1,3 +1,3 @@
 @echo off
-a3 src\stable\SpiceHunter.as -outputtemp -default-frame-rate=200 -debug=true
+a3 src\SpiceHunter.as -outputtemp -default-frame-rate=200 -compiler.optimize -compiler.include-libraries swfs/pixeldroid.swc -use-network=false
 IF errorlevel 1 pause
