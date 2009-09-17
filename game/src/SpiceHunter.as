@@ -103,7 +103,6 @@ public class SpiceHunter extends Sprite implements IGameRom
 
   public function setControlsProxy(value : IGameControlsProxy) : void
     {
-    trace("setControlsProxy");
     controls = value;
     controls.joystickOpen(0); // activate joystick for player 1
     controls.joystickOpen(1); // activate joystick for player 2
@@ -113,12 +112,10 @@ public class SpiceHunter extends Sprite implements IGameRom
 
   public function setHighScoresProxy(value : IGameHighScoresProxy) : void
     {
-    trace("setHighScoresProxy");
     }
 
   public function enterAttractLoop() : void
     {
-    trace("Now we are entering the attract loop.");
     controls.joystickEventState(JoystickEventStateEnum.ENABLE, this.stage); // enable event reporting
     FourPlayerControl.instance.connect(controls);
     attract = new Attract(controls,Attract.STATE_TITLE);
@@ -127,7 +124,6 @@ public class SpiceHunter extends Sprite implements IGameRom
   // entry pointsd
   public function SpiceHunter()
     {
-    trace("Sup! says the entrypoint.");
     var i : int;
     
     Assets.init(this);
