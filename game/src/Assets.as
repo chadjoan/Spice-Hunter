@@ -16,9 +16,9 @@ import flash.text.Font;
         public static var title_dummy:Class;
         [Embed(source="../fonts/number.ttf", fontName="number")]
         public static var number_dummy:Class;
-        [Embed(source="../src/com/pixeldroid/tools/osd/VeraMono.ttf", fontName="VeraMono")]
+        [Embed(source="../src/com/pixeldroid/r_c4d3/tools/console/VeraMono.ttf", fontName="VeraMono")]
         public static var VeraMono_dummy:Class;
-        [Embed(source="../src/com/pixeldroid/tools/framerate/PixelHugger.ttf", fontName="PixelHugger")]
+        [Embed(source="../src/com/pixeldroid/r_c4d3/tools/framerate/PixelHugger.ttf", fontName="PixelHugger")]
         public static var PixelHugger_dummy:Class;
         [Embed(source="../images/LeftArmPowerup4.png")]
         public static var LeftArmPowerup4:Class;

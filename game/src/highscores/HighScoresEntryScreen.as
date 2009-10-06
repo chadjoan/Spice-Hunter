@@ -10,7 +10,7 @@ import flash.text.TextFormat;
 import legacy.ControlEvent;
 import legacy.PlayerControlListener;
 
-import com.pixeldroid.r_c4d3.scoring.RemoteHighScores;
+import com.pixeldroid.r_c4d3.scores.RemoteHighScores;
 
 import highscores.HighScores;
 import highscores.HighScoresPanel;

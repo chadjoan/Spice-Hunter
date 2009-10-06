@@ -4,7 +4,7 @@ import flash.display.Sprite;
 
 import legacy.FourPlayerControl;
 
-import com.pixeldroid.interfaces.IGameControlsProxy;
+import com.pixeldroid.r_c4d3.interfaces.IGameControlsProxy;
 import com.pixeldroid.r_c4d3.controls.JoyHatEvent;
 import com.pixeldroid.r_c4d3.controls.JoyButtonEvent;
 
@@ -82,42 +82,46 @@ public class PlayerControlListener extends Sprite
     connected = false;
     }
 
-  private var lastHatValue : uint;
+  private var lastHatValues : Array = new Array();
+  private var currentPlayerId : uint;
   private var currentHatValue : uint;
 
   private function onHatMotion( evt : JoyHatEvent ) : void
     {
+    trace("onHatMotion(player = "+evt.which+")");
     currentHatValue = evt.value;
+    currentPlayerId = evt.which;
 
     if ( joyPressed(JoyHatEvent.HAT_UP) )
-      Up(newControlEvent("U_press",evt.which));
+      Up(newControlEvent("U_press",currentPlayerId));
 
     if ( joyReleased(JoyHatEvent.HAT_UP) )
-      Ur(newControlEvent("U_release",evt.which));
+      Ur(newControlEvent("U_release",currentPlayerId));
 
     if ( joyPressed(JoyHatEvent.HAT_DOWN) )
-      Dp(newControlEvent("D_press",evt.which));
+      Dp(newControlEvent("D_press",currentPlayerId));
 
     if ( joyReleased(JoyHatEvent.HAT_DOWN) )
-      Dr(newControlEvent("D_release",evt.which));
+      Dr(newControlEvent("D_release",currentPlayerId));
 
     if ( joyPressed(JoyHatEvent.HAT_RIGHT) )
-      Rp(newControlEvent("R_press"  ,evt.which));
+      Rp(newControlEvent("R_press"  ,currentPlayerId));
 
     if ( joyReleased(JoyHatEvent.HAT_RIGHT) )
-      Rr(newControlEvent("R_release",evt.which));
+      Rr(newControlEvent("R_release",currentPlayerId));
 
     if ( joyPressed(JoyHatEvent.HAT_LEFT) )
-      Lp(newControlEvent("L_press"  ,evt.which));
+      Lp(newControlEvent("L_press"  ,currentPlayerId));
 
     if ( joyReleased(JoyHatEvent.HAT_LEFT) )
-      Lr(newControlEvent("L_release",evt.which));
+      Lr(newControlEvent("L_release",currentPlayerId));
 
-    lastHatValue = currentHatValue;
+    lastHatValues[currentPlayerId] = currentHatValue;
     }
 
   private function joyPressed( mask : uint ) : Boolean
     {
+    var lastHatValue : uint = lastHatValues[currentPlayerId];
     var diff : uint = lastHatValue ^ currentHatValue;
     if ( diff & currentHatValue & mask )
       return true;
@@ -127,6 +131,7 @@ public class PlayerControlListener extends Sprite
 
   private function joyReleased( mask : uint ) : Boolean
     {
+    var lastHatValue : uint = lastHatValues[currentPlayerId];
     var diff : uint = lastHatValue ^ currentHatValue;
     if ( diff & lastHatValue & mask )
       return true;

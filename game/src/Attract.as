@@ -4,7 +4,7 @@ import Assets;
 import Screen;
 import highscores.HighScores;
 
-import com.pixeldroid.interfaces.IGameControlsProxy;
+import com.pixeldroid.r_c4d3.interfaces.IGameControlsProxy;
 import com.pixeldroid.r_c4d3.controls.JoyButtonEvent;
 import legacy.ControlEvent;
 

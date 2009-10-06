@@ -1,6 +1,6 @@
 package legacy {
 
-import com.pixeldroid.interfaces.IGameControlsProxy;
+import com.pixeldroid.r_c4d3.interfaces.IGameControlsProxy;
 
 // This class used to be much more, but now it is a stub that wraps a global
 //   instance of IGameControlsProxy.

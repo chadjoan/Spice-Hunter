@@ -10,12 +10,13 @@ import Attract;
 import highscores.HighScores;
 import highscores.HighScoresEntryScreen;
 
-import com.pixeldroid.interfaces.IGameRom;
-import com.pixeldroid.interfaces.IGameControlsProxy;
-import com.pixeldroid.interfaces.IGameHighScoresProxy;
+//com.pixeldroid.r_c4d3.interfaces.IGameRom;
+import com.pixeldroid.r_c4d3.interfaces.IGameRom;
+import com.pixeldroid.r_c4d3.interfaces.IGameControlsProxy;
+import com.pixeldroid.r_c4d3.interfaces.IGameScoresProxy;
 import com.pixeldroid.r_c4d3.controls.JoyHatEvent;
 import com.pixeldroid.r_c4d3.controls.JoyButtonEvent;
-import com.pixeldroid.enumerations.JoystickEventStateEnum;
+import com.pixeldroid.r_c4d3.controls.JoyEventStateEnum;
 
 import legacy.FourPlayerControl;
 
@@ -69,6 +70,7 @@ public class SpiceHunter extends Sprite implements IGameRom
   
   private var mapSwfs : Array; // array of movieclips
   private var starmapPlaying : Boolean = false;
+  private var r_c4d3_acknowledged : Boolean = false;
   private static const movieFPS : Number = 50.0; // desired framerate to play swfs at
                                                  // this does not affect gameplay
   
@@ -110,15 +112,16 @@ public class SpiceHunter extends Sprite implements IGameRom
     controls.joystickOpen(3); // activate joystick for player 4
     }
 
-  public function setHighScoresProxy(value : IGameHighScoresProxy) : void
+  public function setScoresProxy(value : IGameScoresProxy) : void
     {
     }
 
   public function enterAttractLoop() : void
     {
-    controls.joystickEventState(JoystickEventStateEnum.ENABLE, this.stage); // enable event reporting
+    controls.joystickEventState(JoyEventStateEnum.ENABLE, this.stage); // enable event reporting
     FourPlayerControl.instance.connect(controls);
     attract = new Attract(controls,Attract.STATE_TITLE);
+    r_c4d3_acknowledged = true;
     }
   
   // entry pointsd
@@ -180,6 +183,9 @@ public class SpiceHunter extends Sprite implements IGameRom
 
   public function enterFrame (event:Event) : void
     {
+    if ( !r_c4d3_acknowledged == true )
+      return;
+    
     switch (state)
       {
       case STATE_ATTRACT:

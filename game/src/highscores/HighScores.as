@@ -1,9 +1,9 @@
 package highscores
 {
 
-import com.pixeldroid.data.DataEvent;
-import com.pixeldroid.r_c4d3.scoring.ScoreEvent;
-import com.pixeldroid.r_c4d3.scoring.RemoteHighScores;
+import com.pixeldroid.r_c4d3.data.DataEvent;
+import com.pixeldroid.r_c4d3.scores.ScoreEvent;
+import com.pixeldroid.r_c4d3.scores.RemoteHighScores;
 
 import flash.text.*;
 import flash.display.*;
