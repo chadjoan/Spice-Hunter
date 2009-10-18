@@ -5,7 +5,7 @@ import flash.text.TextField;
 
 public class Profiler extends Sprite
   {
-  private static const doProfiling : Boolean = true; // toggles profiling on/off
+  private static const doProfiling : Boolean = false; // toggles profiling on/off
   private static const updateRate : Number = 1000; // milliseconds between updates
   
   public var measureName : String;
