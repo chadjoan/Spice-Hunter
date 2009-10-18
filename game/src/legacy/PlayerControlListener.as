@@ -88,7 +88,7 @@ public class PlayerControlListener extends Sprite
 
   private function onHatMotion( evt : JoyHatEvent ) : void
     {
-    trace("onHatMotion(player = "+evt.which+")");
+    //trace("onHatMotion(player = "+evt.which+")");
     currentHatValue = evt.value;
     currentPlayerId = evt.which;
 

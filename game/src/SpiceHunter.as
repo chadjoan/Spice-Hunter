@@ -340,7 +340,7 @@ public class SpiceHunter extends Sprite implements IGameRom
     shipspecs[4-1].teamCode = ShipSpec.BLUE_TEAM;
        
     // Assigning human players and CPU players    
-    shipspecs[0].isCPUControlled = true;           
+    shipspecs[0].isCPUControlled = false; // Player 1 defaults to human.           
     shipspecs[1].isCPUControlled = true;    
     shipspecs[2].isCPUControlled = true;    
     shipspecs[3].isCPUControlled = true;             
