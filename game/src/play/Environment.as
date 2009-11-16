@@ -17,6 +17,7 @@ import flash.media.Sound;
 public class Environment
   {
    // Temporary profilers used to find out what is slowing the game down.
+   // See Profiler.as for settings (ex: how to turn them off).
   private var totalTimeProfiler:Profiler  = new Profiler("Total Time");
   private var vmTimeProfiler:Profiler     = new Profiler("VM Time");
   private var gameTimeProfiler:Profiler   = new Profiler("Game Time");
@@ -65,7 +66,7 @@ public class Environment
   public var levelMusic : Sound;      // Music, can be set by the Level.       
   private var level : Level;          // Extensible class for implementing different levels.
   
-  
+  private var paused : Boolean = false;
          
   // Constructs a new game environment. Accepts an array of ship specifications as input.
   public function Environment (_shipspecs:Array, round : Number )
@@ -91,7 +92,8 @@ public class Environment
     isExpired = false;    
     
     bg = null;
-    levelDuration = 180;
+    //levelDuration = 180;
+	levelDuration = 90;
     levelMusic = null;
     
     // Initialize base locations to the corners.    
@@ -262,6 +264,17 @@ public class Environment
     totalTimeProfiler.startBench();
     vmTimeProfiler.startBench();
     // end profiler setup
+    
+    Screen.root.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
+    }
+    
+  // Listen for the pause key.
+  private function onKeyUp( e : KeyboardEvent ) : void
+    {
+    if ( e.keyCode == 19 )
+      {
+      paused = !paused;
+      }
     }
   
   public function onEnterFrame() : void
@@ -280,108 +293,115 @@ public class Environment
     Screen.draw();
     screenDrawProfiler.endBench();
     
-    logicTimeProfiler.startBench();
     // Update the frame rate counter - we can figure out our relative timestep from its FPS field.
     fpsDisplay.update();
-    var deltaT : Number = 25.0 / fpsDisplay.FPS;
     
-    // Lil hack here for low-end machines - if FPS drops below 15,
-    //   this limits the frametime, making the game a bit more playable.
-    // Everything will still be slower, but the physics will also
-    //   slow down and thus remain stable.  So it will still be a
-    //   slide show, but the slides will actually make sense.  
-    if ( deltaT > 25.0 / 15.0 )
-      deltaT = 25.0 / 15.0;
+    if ( !paused )
+      {
     
-    // Lots of weird odds and ends here at the beginning. This code is mostly 
-    // associated with starting and shutting down the environment properly.
-    // --------------------------------------------------------- <weird>    
-    // Activates / progresses the start countdown. This is happening at the beginning of the round.	    
-    if (!go321.isDone() )
-      go321.update(deltaT);           
-    // Trigger these operations just once.  
-    if (go321.isDone() && !triggeredControls)  	    
-      {
-      // Start accepting input.
-      controls = new Controls(this);	
-      triggeredControls = true;
-      go321.expire();      
-      // Start up the level countdown clock.
-      gameClock = new GameClock(levelDuration);      
-      // Start playing music if the level has established a tune.
-      if (levelMusic != null)
-        Utility.playSound ( levelMusic );
-      }          
-    // Detects the countdown/zero conditions. This is happening at the end of the round.
-    if (gameClock != null)   
-      {
-      gameClock.update(deltaT);      
-      // Times up? Run the destructor - expire() method.
-      if (gameClock.clockIsZero() )
+      logicTimeProfiler.startBench();
+      
+      var deltaT : Number = 25.0 / fpsDisplay.FPS;
+      
+      // Lil hack here for low-end machines - if FPS drops below 15,
+      //   this limits the frametime, making the game a bit more playable.
+      // Everything will still be slower, but the physics will also
+      //   slow down and thus remain stable.  So it will still be a
+      //   slide show, but the slides will actually make sense.  
+      if ( deltaT > 25.0 / 15.0 )
+        deltaT = 25.0 / 15.0;
+      
+      // Lots of weird odds and ends here at the beginning. This code is mostly 
+      // associated with starting and shutting down the environment properly.
+      // --------------------------------------------------------- <weird>    
+      // Activates / progresses the start countdown. This is happening at the beginning of the round.	    
+      if (!go321.isDone() )
+        go321.update(deltaT);           
+      // Trigger these operations just once.  
+      if (go321.isDone() && !triggeredControls)  	    
         {
-        expire(); 
-        return;
+        // Start accepting input.
+        controls = new Controls(this);	
+        triggeredControls = true;
+        go321.expire();      
+        // Start up the level countdown clock.
+        gameClock = new GameClock(levelDuration);      
+        // Start playing music if the level has established a tune.
+        if (levelMusic != null)
+          Utility.playSound ( levelMusic );
+        }          
+      // Detects the countdown/zero conditions. This is happening at the end of the round.
+      if (gameClock != null)   
+        {
+        gameClock.update(deltaT);      
+        // Times up? Run the destructor - expire() method.
+        if (gameClock.clockIsZero() )
+          {
+          expire(); 
+          return;
+          }
         }
+      // --------------------------------------------------------- </weird>
+      // It's all regular stuff from here on out.
+      
+      updateCPUShipAI ();  
+      
+      // Apply level forces to objects - only after countdown is over.
+      if ( go321.isDone() )
+        level.applyForcesIntoEnvironment(this, deltaT); 
+            
+      var loop1:int;                
+      for (loop1 = 0; loop1 < ships.length; loop1++)
+        ships[loop1].updateVelocity(deltaT);
+      
+      // Check for collisions among EVERYTHING (whew) and apply all sorts of rules (globbing spice, splitting asteroids, etc)
+      // Lots of stuff happens in this function.
+      handleCollisions();
+      
+      // Special handler for spice / homebase collision - which is where scoring and some bonus things popup.
+      handleScoring ();    
+            
+      // Update asteroid positions.
+      for (loop1=0; loop1 < asteroids.length; loop1++)         
+        asteroids[loop1].updatePosition(deltaT);	        
+      // Update anchor positions.
+      level.updateAnchors(this, deltaT);
+      for (loop1=0; loop1 < anchors.length; loop1++)         
+        anchors[loop1].updatePosition();	         
+      // Update spice positions.
+      for (loop1=0; loop1 < spices.length; loop1++)    
+        spices[loop1].updatePosition(deltaT);     
+      // Update ship positions.
+      for (loop1=0; loop1 < ships.length; loop1++)
+        ships[loop1].updatePosition(deltaT);        
+      // Update animations (advance a frame)
+      for (loop1 = 0; loop1 < animations.length; loop1++)
+        animations[loop1].update(deltaT);    
+      // Update scoreLooper animations (advance a frame)    
+      for (loop1 = 0; loop1 < scoreLoopers.length; loop1++)
+        scoreLoopers[loop1].update(deltaT);      
+      
+      // An expired thing should be removed from the Screen and popped out of storage into the bit bucket. Three cases:
+      //   1.  asteroids get expired when they explode.
+      //   2.  spice gets expired when it is globbed or dragged home.
+      //   3.  animations get expired when the have played through all their frames.
+      removeExpiredThings ();
+      
+      // Make reticles stick to objects - this triggers a search under each reticle and
+      // makes each one track whatever is underneath it, a little bit.        
+      reticleSearch();      
+      
+      // Self-explanatories...
+      createNewAsteroids (deltaT);
+      createNewSpice (deltaT);
+    
+      // profiling code
+      logicTimeProfiler.endBench();
+    
+      // The tether are unique gameplay objects that have their own, nonstandard updates.
+      updateTethers(deltaT);
       }
-    // --------------------------------------------------------- </weird>
-    // It's all regular stuff from here on out.
-    
-    updateCPUShipAI ();  
-     
-    // Apply level forces to objects - only after countdown is over.
-    if ( go321.isDone() )
-      level.applyForcesIntoEnvironment(this, deltaT); 
-          
-    var loop1:int;                
-    for (loop1 = 0; loop1 < ships.length; loop1++)
-      ships[loop1].updateVelocity(deltaT);
-    
-    // Check for collisions among EVERYTHING (whew) and apply all sorts of rules (globbing spice, splitting asteroids, etc)
-    // Lots of stuff happens in this function.
-    handleCollisions();
-    
-    // Special handler for spice / homebase collision - which is where scoring and some bonus things popup.
-    handleScoring ();    
-           
-    // Update asteroid positions.
-    for (loop1=0; loop1 < asteroids.length; loop1++)         
-      asteroids[loop1].updatePosition(deltaT);	        
-    // Update anchor positions.
-    level.updateAnchors(this, deltaT);
-    for (loop1=0; loop1 < anchors.length; loop1++)         
-      anchors[loop1].updatePosition();	         
-    // Update spice positions.
-    for (loop1=0; loop1 < spices.length; loop1++)    
-      spices[loop1].updatePosition(deltaT);     
-    // Update ship positions.
-    for (loop1=0; loop1 < ships.length; loop1++)
-      ships[loop1].updatePosition(deltaT);        
-    // Update animations (advance a frame)
-    for (loop1 = 0; loop1 < animations.length; loop1++)
-      animations[loop1].update(deltaT);    
-    // Update scoreLooper animations (advance a frame)    
-    for (loop1 = 0; loop1 < scoreLoopers.length; loop1++)
-      scoreLoopers[loop1].update(deltaT);      
-    
-    // An expired thing should be removed from the Screen and popped out of storage into the bit bucket. Three cases:
-    //   1.  asteroids get expired when they explode.
-    //   2.  spice gets expired when it is globbed or dragged home.
-    //   3.  animations get expired when the have played through all their frames.
-    removeExpiredThings ();
-    
-    // Make reticles stick to objects - this triggers a search under each reticle and
-    // makes each one track whatever is underneath it, a little bit.        
-    reticleSearch();      
-    
-    // Self-explanatories...
-    createNewAsteroids (deltaT);
-    createNewSpice (deltaT);       
-    
-    // profiling code
-    logicTimeProfiler.endBench();
-    
-    // The tether are unique gameplay objects that have their own, nonstandard updates.
-    updateTethers(deltaT);
+    // if ( !paused )
     
     gameTimeProfiler.endBench();
     vmTimeProfiler.startBench();
@@ -1613,6 +1633,9 @@ public class Environment
                
     // Mark this environment as expired - this is visible from main, and will be a cue to instantiate a new garage, etc.
     isExpired = true;
+    
+    // Stop listening for the pause key.
+    Screen.root.stage.removeEventListener(KeyboardEvent.KEY_UP, this.onKeyUp);
     }
     
   }
