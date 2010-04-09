@@ -31,33 +31,33 @@ package com.pixeldroid.r_c4d3.proxies
 	public class KeyboardGameControlsProxy extends EventDispatcher implements IGameControlsProxy
 	{
 		/** Constant representing the yellow button (button X) */
-		public const BTN_X:int = 0;
+		public static const BTN_X:int = 0;
 		
 		/** Constant representing the red button (button A) */
-		public const BTN_A:int = 1;
+		public static const BTN_A:int = 1;
 		
 		/** Constant representing the blue button (button B) */
-		public const BTN_B:int = 2;
+		public static const BTN_B:int = 2;
 		
 		/** Constant representing the green button (button C) */
-		public const BTN_C:int = 3;
+		public static const BTN_C:int = 3;
 		
 		
 		/** Constant representing hat up */
-		public const HAT_U:int = 0;
+		public static const HAT_U:int = 0;
 		
 		/** Constant representing hat right */
-		public const HAT_R:int = 1;
+		public static const HAT_R:int = 1;
 		
 		/** Constant representing hat down */
-		public const HAT_D:int = 2;
+		public static const HAT_D:int = 2;
 		
 		/** Constant representing hat left */
-		public const HAT_L:int = 3;
+		public static const HAT_L:int = 3;
 
 		
-		
 		protected var joysticks:Array;
+		protected var joysticksDefined:Array;
 		protected var gameStage:Stage;
 		protected var _joystickEventState:String;
 		
@@ -98,6 +98,24 @@ package com.pixeldroid.r_c4d3.proxies
 		protected var P4_C:uint = 188;//,
 		
 		
+		// Define an event queue that is populated with events as onKeyUp
+		//   and onKeyDown are called.  When onEnterFrame is called, these
+		//   will be acted upon and the queue cleared.
+		// This is well-ordered FIFO.
+		private var eventQueue : Array /* of KeyboardEvent */;
+		
+		// The capacity of the queue may be larger than it's actual size.
+		// This gives it's actual size, not its capacity.
+		private var nEvents : int; 
+		
+		// A list of keycodes that have been associated with a key release event
+		//   during the latest frame.  
+		private var keysReleased : Array /* of int (key codes) */;
+		
+		// As with the event queue, keysReleased may stay over-allocated.
+		// This gives it's actual size, not its capacity.
+		private var nKeysReleased : int;
+		
 		
 		/**
 		Constructor
@@ -106,11 +124,18 @@ package com.pixeldroid.r_c4d3.proxies
 		{
 			super();
 			
+			keysReleased = new Array();
+			keysReleased[0] = 0; // preallocate one element.
+			nKeysReleased = 0;
+			
+			eventQueue = new Array();
+			eventQueue[3] = null; // preallocate a bit.
+			nEvents = 0;
+			
 			_joystickEventState = JoyEventStateEnum.IGNORE;
 			joysticks = [null, null, null, null];
+			joysticksDefined = [false, false, false];
 		}
-
-
 		
 		/** @inheritdoc */
 		public function joystickClose(joystick:IJoystick):void
@@ -121,8 +146,8 @@ package com.pixeldroid.r_c4d3.proxies
 		/** @inheritdoc */
 		public function joystickEventState(state:String, gameStage:Stage):String
 		{
-			C.out(this, "joystickEventState: " +state);
-			C.out(this, "joystickEventState, state == JoyEventStateEnum.ENABLE ? " +(state == JoyEventStateEnum.ENABLE));
+			//C.out(this, "joystickEventState: " +state);
+			//C.out(this, "joystickEventState, state == JoyEventStateEnum.ENABLE ? " +(state == JoyEventStateEnum.ENABLE));
 			switch (state)
 			{
 				case JoyEventStateEnum.QUERY :
@@ -131,14 +156,16 @@ package com.pixeldroid.r_c4d3.proxies
 				
 				case JoyEventStateEnum.ENABLE :
 					_joystickEventState = JoyEventStateEnum.ENABLE;
-					gameStage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
-					gameStage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
+					gameStage.addEventListener(KeyboardEvent.KEY_DOWN, _onKeyDown);
+					gameStage.addEventListener(KeyboardEvent.KEY_UP, _onKeyUp);
+					gameStage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
 				break;
 				
 				case JoyEventStateEnum.IGNORE :
 					_joystickEventState = JoyEventStateEnum.IGNORE;
-					gameStage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
-					gameStage.removeEventListener(KeyboardEvent.KEY_UP, onKeyUp);
+					gameStage.removeEventListener(KeyboardEvent.KEY_DOWN, _onKeyDown);
+					gameStage.removeEventListener(KeyboardEvent.KEY_UP, _onKeyUp);
+					gameStage.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
 				break;
 			}
 			
@@ -319,6 +346,7 @@ package com.pixeldroid.r_c4d3.proxies
 		/** @inheritdoc */
 		public function joystickOpen(index:int):IJoystick
 		{
+			checkJoystickIndex(index);
 			var j:IJoystick;
 			
 			switch (index)
@@ -338,12 +366,61 @@ package com.pixeldroid.r_c4d3.proxies
 		/** @inheritdoc */
 		public function joystickOpened(index:int):Boolean
 		{
+			checkJoystickIndex(index);
 			return joysticks[index] != null;
 		}
 		
 		/** @inheritdoc */
 		public function numJoysticks():int { return 4; }
 		
+		
+		/**
+		Determines whether keys have been defined for a specific joystick.
+		@param index A zero-based index selecting the joystick to check
+		*/
+		public function joystickKeysDefined(index:int):Boolean
+		{
+			checkJoystickIndex(index);
+			return joysticksDefined[index];
+		}
+
+		
+		/**
+		Provide custom key code assignment for a specific hat direction.
+		@param playerIndex zero based index indicating which player joystick to set codes for.
+		@param hat A KeyboardGameControlsProxy constant (<code>HAT_*</code>) 
+		representing the hat direction to get the keycode value for.
+		@param keyCode Keycode for hat direction
+		*/
+		public function setHatKey(playerIndex:uint, hat:int, keyCode:uint):void
+		{
+			switch (hat)
+			{
+				case HAT_U : setKeys(playerIndex, keyCode,0,0,0, 0,0,0,0); break;
+				case HAT_R : setKeys(playerIndex, 0,keyCode,0,0, 0,0,0,0); break;
+				case HAT_D : setKeys(playerIndex, 0,0,keyCode,0, 0,0,0,0); break;
+				case HAT_L : setKeys(playerIndex, 0,0,0,keyCode, 0,0,0,0); break;
+			}
+		}
+		
+		/**
+		Provide custom key code assignment for a specific button.
+		@param playerIndex zero based index indicating which player joystick to set codes for.
+		@param button A KeyboardGameControlsProxy constant (<code>BTN_*</code>) 
+		representing the button to get the keycode value for.
+		@param keyCode Keycode for button
+		*/
+		public function setButtonKey(playerIndex:uint, button:int, keyCode:uint):void
+		{
+			switch (button)
+			{
+				case BTN_X : setKeys(playerIndex, 0,0,0,0, keyCode,0,0,0); break;
+				case BTN_A : setKeys(playerIndex, 0,0,0,0, 0,keyCode,0,0); break;
+				case BTN_B : setKeys(playerIndex, 0,0,0,0, 0,0,keyCode,0); break;
+				case BTN_C : setKeys(playerIndex, 0,0,0,0, 0,0,0,keyCode); break;
+			}
+		}
+
 		/**
 		Provide custom key code assignments for hat directions and buttons.
 		@param playerIndex zero based index indicating which player joystick to set codes for.
@@ -358,7 +435,10 @@ package com.pixeldroid.r_c4d3.proxies
 		*/
 		public function setKeys(playerIndex:uint, u:uint, r:uint, d:uint, l:uint, x:uint, a:uint, b:uint, c:uint):void
 		{
-			C.out(this, "setKeys for p" +playerIndex +": " +[u,r,d,l,x,a,b,c]);
+			//C.out(this, "setKeys for p" +playerIndex +": " +[u,r,d,l,x,a,b,c]);
+			
+			checkJoystickIndex(playerIndex);
+			
 			switch (playerIndex)
 			{
 				case 0 :
@@ -405,6 +485,7 @@ package com.pixeldroid.r_c4d3.proxies
 					P4_C = c || P4_C;
 				break;              
 			}
+			joysticksDefined[playerIndex] = true;
 		}
 		
 		override public function toString():String
@@ -448,8 +529,11 @@ package com.pixeldroid.r_c4d3.proxies
 			s += "\n  Green (C): " +P4_C +" (" +KeyLabels.getLabel(P4_C) +")";
 			return s;
 		}
-		
 
+		protected function checkJoystickIndex(index:int):void
+		{
+			if (index < 0 || index >= numJoysticks()) throw new Error("index " +index +" invalid. Must be in range [0," +(numJoysticks()-1) +"]");
+		}
 
 		protected function sendHatPress(j:IJoystick, eventMask:int):void
 		{
@@ -496,13 +580,99 @@ package com.pixeldroid.r_c4d3.proxies
 			dispatchEvent(new JoyButtonEvent(JoyButtonEvent.JOY_BUTTON_MOTION, j.index, i, b));
 		}
 		
+
+		// On some versions of linux flash player, there is a bug that causes
+		//   press-and-hold to be interpreted as many clicks.
+		// https://bugs.adobe.com/jira/browse/FP-2369
+		// The pattern is release-press pairs being issued on the same frame;
+		//   a sequence unlikely to be performed by any mere mortal.
+		// Here we filter out these events that are triggered faster than
+		//   humanly possible.
+		// Returns true if this event shouldn't be possible.
+		private function isBogusKeyEvent(keyCode:uint):Boolean
+		{
+			var i : int;
+			
+			for ( i = 0; i < nKeysReleased; i++ )
+				if ( keyCode == keysReleased[i] )
+					return true;
+
+			return false;
+		}
 		
+		private function _onKeyDown(e:KeyboardEvent):void
+		{
+			if ( isBogusKeyEvent(e.keyCode) )
+			{
+				// Filter the release-press pairs typical of flash player's bug.
+				var i : int;
+				for ( i = 0; i < nEvents; i++ )
+				{
+					if ( eventQueue[i] != null && 
+						eventQueue[i].keyCode == e.keyCode )
+					{
+						// My tactic here is to simply set bogus events to null,
+						//   and just ignore the nulls when in onEnterFrame.
+						// This is very intentional.
+						// What you don't want to do is remove them.
+						// That has two problems:
+						// -If you use the fast O(1) method for removal, then
+						//   it will change the ordering of the queues elements.
+						//   That's bad.
+						// -The O(n) method involves sliding the queue 
+						//   remainder towards the 0th element by 1.
+						//   This violates any indices pointing into the queue.
+						//   The current scheme doesn't have such indices, but
+						//   if that changes it would be an ugly thing to 
+						//   violate.
+						eventQueue[i] = null;
+					}
+				}
+			}
+			else
+			{
+				eventQueue[nEvents] = e;
+				nEvents++;
+			}
+		}
+		
+		private function _onKeyUp(e:KeyboardEvent):void
+		{
+			eventQueue[nEvents] = e;
+			nEvents++;
+			
+			keysReleased[nKeysReleased] = e.keyCode;
+			nKeysReleased++;
+		}
+		
+		private var frameCount : int = 0;
+		private function onEnterFrame( e : Event ) : void
+		{
+			var i : int;
+			
+			for ( i = 0; i < nEvents; i++ )
+			{
+				var event : KeyboardEvent = eventQueue[i];
+				
+				if ( event != null ) // Some events were filtered out.
+				{
+					if ( event.type == KeyboardEvent.KEY_DOWN )
+						onKeyDown(event);
+					else
+						onKeyUp(event);
+				}
+			}
+			
+			// Flush the queues.
+			nKeysReleased = 0;
+			nEvents = 0;
+		}
 		
 		protected function onKeyDown(e:KeyboardEvent):void
 		{
 			var kc:uint = e.keyCode;
 			//C.out(this, "onKeyDown - " +kc);
-			
+
 			switch(kc)
 			{
 				case P1_U : sendHatPress(IJoystick(joysticks[0]), JoyHatEvent.HAT_UP);   break;
@@ -547,6 +717,7 @@ package com.pixeldroid.r_c4d3.proxies
 		{
 			var kc:uint = e.keyCode;
 			//C.out(this, "onKeyUp - " +kc);
+			
 			switch(kc)
 			{
 				case P1_U : sendHatRelease(IJoystick(joysticks[0]), JoyHatEvent.HAT_UP);   break;

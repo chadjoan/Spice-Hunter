@@ -1,4 +1,4 @@
-
+﻿
 
 package com.pixeldroid.r_c4d3.scores 
 {
@@ -43,7 +43,6 @@ package com.pixeldroid.r_c4d3.scores
 			else
 			{
 				//C.out(this, "Error - invalid game id: '" +gameId+"'");
-        trace(this.toString() + "Error - invalid game id: '" +gameId+"'");
 				_gameId = null;
 			}
 		}
@@ -65,7 +64,6 @@ package com.pixeldroid.r_c4d3.scores
 			else
 			{
 				//C.out(this, "Error - invalid value for totalScores: " +value);
-        trace(this.toString() + "Error - invalid value for totalScores: " +value);
 				MAX_SCORES = 0;
 			}
 		}

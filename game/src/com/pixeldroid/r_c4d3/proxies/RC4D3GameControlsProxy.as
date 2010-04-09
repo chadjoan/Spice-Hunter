@@ -60,7 +60,7 @@ package com.pixeldroid.r_c4d3.proxies
 			if (kc == BTN_M)
 			{
 				try { navigateToURL(new URLRequest(PathConstants.RETURN_TO_MENU), "_top"); }
-				catch (e:Error) { C.out(this, "navigation error: " +e, true); }
+				catch (e:Error) { /*C.out(this, "navigation error: " +e, true);*/ }
 			}
 			
 			else super.onKeyDown(e);

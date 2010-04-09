@@ -43,6 +43,13 @@ package com.pixeldroid.r_c4d3.interfaces
 	public interface IGameRom
 	{
 		/**
+		Provide a reference to the preloaded config data for the GameRom to 
+		use for initialization.
+		@param value A ConfigDataProxy instance
+		*/
+		//TODO: function setConfigData(value:ConfigDataProxy):void;
+		
+		/**
 		Provide a reference to the controls proxy for the GameRom to 
 		use for reading user input.
 		@param value An implementation of IGameControlsProxy
