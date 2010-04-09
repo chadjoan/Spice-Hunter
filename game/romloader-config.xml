@@ -12,46 +12,44 @@
 	<!-- key mappings, player numbers start at 1 -->
 	<keymappings>
 		<joystick playerNumber="1">
-			<hatUp    keyCode="38" /><!-- Arrow Up -->
-			<hatRight keyCode="39" /><!-- Arrow Right -->
-			<hatDown  keyCode="40" /><!-- Arrow Down -->
-			<hatLeft  keyCode="37" /><!-- Arrow Left -->
-			<buttonX  keyCode="90" /><!-- Z -->
-			<buttonA  keyCode="88" /><!-- X -->
-			<buttonB  keyCode="67" /><!-- C -->
-			<buttonC  keyCode="86" /><!-- V -->
+			<hatRight keyCode="49" />
+			<hatUp    keyCode="50" />
+			<hatLeft  keyCode="51" />
+			<hatDown  keyCode="52" />
+			<buttonX  keyCode="53" />
+			<buttonA  keyCode="54" />
+			<buttonB  keyCode="55" />
+			<buttonC  keyCode="56" />
 		</joystick>
 		<joystick playerNumber="2">
-			<hatUp    keyCode="48"  /><!-- 0 -->
-			<hatRight keyCode="219" /><!-- [ -->
-			<hatDown  keyCode="80"  /><!-- P -->
-			<hatLeft  keyCode="79"  /><!-- O -->
-			<buttonX  keyCode="81" /><!-- Q -->
-			<buttonA  keyCode="87" /><!-- W -->
-			<buttonB  keyCode="69" /><!-- E -->
-			<buttonC  keyCode="82" /><!-- R -->
+			<hatRight keyCode="81" />
+			<hatUp    keyCode="87" />
+			<hatLeft  keyCode="69" />
+			<hatDown  keyCode="82" />
+			<buttonX  keyCode="84" />
+			<buttonA  keyCode="89" />
+			<buttonB  keyCode="85" />
+			<buttonC  keyCode="73" />
 		</joystick>
 		<joystick playerNumber="3">
-			<!-- Be sure to play with numlock ON. -->
-			<hatUp    keyCode="104" /><!-- Numpad Up -->
-			<hatRight keyCode="102" /><!-- Numpad Right -->
-			<hatDown  keyCode="101" /><!-- Numpad Center -->
-			<hatLeft  keyCode="100" /><!-- Numpad Left -->
-			<buttonX  keyCode="65" /><!-- A -->
-			<buttonA  keyCode="83" /><!-- S -->
-			<buttonB  keyCode="68" /><!-- D -->
-			<buttonC  keyCode="70" /><!-- F -->
+			<hatRight keyCode="65" />
+			<hatUp    keyCode="83" />
+			<hatLeft  keyCode="68" />
+			<hatDown  keyCode="70" />
+			<buttonX  keyCode="71" />
+			<buttonA  keyCode="72" />
+			<buttonB  keyCode="74" />
+			<buttonC  keyCode="75" />
 		</joystick>
 		<joystick playerNumber="4">
-			<!-- Be sure to play with numlock ON. -->
-			<hatUp    keyCode="73" /><!-- I -->
-			<hatRight keyCode="76" /><!-- L -->
-			<hatDown  keyCode="75" /><!-- K -->
-			<hatLeft  keyCode="74" /><!-- J -->
-			<buttonX  keyCode="97" /><!-- Numpad 1 -->
-			<buttonA  keyCode="98" /><!-- Numpad 2 (down) -->
-			<buttonB  keyCode="99" /><!-- Numpad 3 -->
-			<buttonC  keyCode="13" /><!-- Numpad Enter (Same as normal enter) -->
+			<hatRight keyCode="90" />
+			<hatUp    keyCode="88" />
+			<hatLeft  keyCode="67" />
+			<hatDown  keyCode="86" />
+			<buttonX  keyCode="66" />
+			<buttonA  keyCode="78" />
+			<buttonB  keyCode="77" />
+			<buttonC  keyCode="188" />
 		</joystick>
 	</keymappings>
 
