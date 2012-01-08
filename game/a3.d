@@ -38,8 +38,8 @@ string[] assetExts;
 //];
 
 immutable string[] swfExts = ["swf (disabled!)"];
-immutable string[] imageExts = ["svg"];
-immutable string[] soundExts = ["jpg","jpeg","png","gif"];
+immutable string[] imageExts = ["jpg","jpeg","png","gif"]; //["svg"];
+immutable string[] soundExts = ["mp3"];
 immutable string[] fontExts = ["ttf"];
 
 static Regex!char fileRegExp;
@@ -440,6 +440,8 @@ int main( string[] args )
         }
         asset = temp.idup;
         
+		writefln("extension == %s, extType == %s", extension, extType( extension ) );
+		
         // Add the embed tag.  
         if ( std.string.icmp( extension, "ttf" ) == 0 )
         {
@@ -449,6 +451,14 @@ int main( string[] args )
               asset, idname,
               idname ~ "_dummy" );
         }
+		//else if ( extType( extension ) == SOUND )
+		//{
+        //  assets ~= std.string.format(
+        //     `        [Embed(source="%s")]` ~ nl ~
+        //     `        public static var %s:Sound;` ~ nl,
+        //      asset,
+        //      idname );
+		//}
         else
         {
           assets ~= std.string.format(
