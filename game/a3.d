@@ -449,6 +449,17 @@ int main( string[] args )
               asset, idname,
               idname ~ "_dummy" );
         }
+		else if ( extType( extension ) == SOUND )
+		{
+          assets ~= std.string.format(
+             `        [Embed(source="%s")]` ~ nl ~
+             `        public static var %s__SOUNDTEMP__:Class;` ~ nl ~
+             `        public static var %s:Sound = new %s__SOUNDTEMP__ as Sound;` ~ nl,
+              asset,
+              idname,
+              idname,
+              idname );
+		}
         else
         {
           assets ~= std.string.format(
