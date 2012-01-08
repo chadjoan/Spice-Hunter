@@ -1,5 +1,8 @@
 // This is the Actionscript 3 builder by Chad Joan
 
+import std.algorithm;
+import std.range;
+import std.stdio;
 import std.file;
 import std.path;
 import std.conv;
@@ -34,7 +37,7 @@ string[] assetExts;
 //"ttf",
 //];
 
-immutable string[] swfExts = ["swf"];
+immutable string[] swfExts = ["swf (disabled!)"];
 immutable string[] imageExts = ["svg"];
 immutable string[] soundExts = ["jpg","jpeg","png","gif"];
 immutable string[] fontExts = ["ttf"];
@@ -53,7 +56,7 @@ static this()
 	assetExts ~= soundExts;
 	assetExts ~= fontExts;
     
-    fileRegExp = Regex!char( "Assets[.][_A-Za-z].*?[^_A-Za-z0-9]", "g" );
+    fileRegExp = regex( "Assets[.][_A-Za-z].*?[^_A-Za-z0-9]", "g" );
 }
 
 enum // extension type
@@ -92,7 +95,8 @@ int main( string[] args )
     auto rootdirs = new string[1]; // one for the cwd
     auto assetFiles = new string[0];
     auto passedArgs = new string[0];
-    auto assetsUsed = new string[0];
+    shared assetsReferenced = cast(shared)(new string[0]);
+	string[] assetsUsed;
     auto cwd = std.file.getcwd();
     auto mainDir = cwd;
     string resultName = null;
@@ -205,7 +209,7 @@ int main( string[] args )
                     
                     // Make sure it really is a directory.  
                     if ( !std.file.exists( dirName ) || 
-                         !std.file.isdir( dirName ) )
+                         !std.file.isDir( dirName ) )
                     {
                         if ( j == i+1 )
                             throw new Error( args[i]~" switch must be "
@@ -262,7 +266,7 @@ int main( string[] args )
     {
 		auto name = entry.name;
         auto fullName = std.path.join( currentRootDir, name );
-        if ( std.file.isfile( fullName ) )
+        if ( std.file.isFile( fullName ) )
         {
             auto ext = std.path.getExt( name );
             
@@ -280,7 +284,7 @@ int main( string[] args )
             {
                 case "as":
                     srcFiles ~= enQouteIfSpace( fullName );
-                    searchForAssetUsage( fullName, assetsUsed );
+					assetsReferenced ~= getAssetReferences(fullName);
                     break;
                 /+case "swf":
                     // We aren't interested in previous build results.  
@@ -298,35 +302,17 @@ int main( string[] args )
                     break;
             }
         }
-        //else if ( recursive && std.file.isdir( fullName ) )
-        //{
-        //    // Backup the current path, then add the branch on the end.  
-        //    auto temp = currentRootDir.idup;
-        //    currentRootDir = fullName;
-        //    
-        //    // Recurse into the next dir.
-        //    std.file.listdir( fullName, &checkFile );
-        //    
-        //    // Clean up, and restore the path before we went on that tangent.
-        //    delete currentRootDir;
-        //    currentRootDir = temp;
-        //}
-        
-        return true; // Continue to the next file.  
     }
-    
-    //foreach( dir; rootdirs )
-    //{
-    //    currentRootDir = dir;
-    //    std.file.listdir( dir, &checkFile );
-    //}
+	
+	assetsUsed = cast(string[])assetsReferenced;
+	assetsUsed = array(std.algorithm.filter!"a == a"(sort(assetsUsed)));
     
     //---------------------------------------------------------------------
     // Generate assets class
     //---------------------------------------------------------------------
     
     auto assetFile = std.path.join( mainDir, "Assets.as" );
-    auto nameCorrectnessRegex = Regex!char("[^_a-zA-Z0-9]");
+    auto nameCorrectnessRegex = regex("[^_a-zA-Z0-9]");
     
     const nl = std.string.newline;
     //char[] initBody = new char[0];
@@ -349,12 +335,21 @@ int main( string[] args )
         idname = idname[0..$ - (extension.length+1)]; // chop off the extension
         
 		auto m = match( idname, nameCorrectnessRegex);
-        if ( m.empty )
-            throw new Error( "Asset file " ~ nl ~ asset ~ nl ~
+        if ( !m.empty )
+		{
+			auto err = "Asset file " ~ nl ~ asset ~ nl ~
                 "with name \""~idname~
                 "\" does not have a valid name." ~ nl ~
                 "The name of an asset must contain only alphabetic characters "
-                "(a-z, A-Z), numbers (0-9), or an underscore _." );
+                "(a-z, A-Z), numbers (0-9), or an underscore _.";
+				
+			
+			// For some reason just throwing the error on Win64 does not work.
+			// It will not display an error message.  Just a silent crash.
+			// So we'll help it out and write the error to stdout too.
+			writeln(err);
+            throw new Error(err);
+		}
         
         // check to make sure that the id is unique.
         // if it isn't, throw an error.  
@@ -376,12 +371,10 @@ int main( string[] args )
         {
             // If this asset isn't used, don't embed it.  
             //  (only valid for things that aren't fonts)
-            bool used = false;
-            foreach( assetUsed; assetsUsed )
-            {
-                if ( std.string.cmp( idname, assetUsed ) == 0 )
-                    used = true;
-            }
+			// This does a binary search on assetsUsed to find out if
+			//   assetsUsed contains idname.
+			bool used = !assumeSorted(assetsUsed).equalRange(idname).empty;
+			
             if ( !used )
                 continue;
         }
@@ -411,7 +404,7 @@ int main( string[] args )
                 //   move towards the directory containing this asset (how many backtracks)
                 // in the current example, this ends up being 2
                 int numBacktracks = 0;
-                while ( tempDir.length > 0 )
+                while ( tempDir.length > 0 && tempDir != "." )
                 {
                     tempDir = std.path.getDirName( tempDir );
                     numBacktracks++;
@@ -547,7 +540,7 @@ import flash.text.Font;
         int exitStatus = std.process.system( "mxmlc" ~ mxmlcArgs );
         
         timer.stop();
-        writefln( "Compilation took ", timer.peek.usecs," microseconds." );
+        writefln( "Compilation took %s microseconds.", timer.peek.usecs );
         
         if ( exitStatus != 0 )
             return exitStatus;
@@ -592,7 +585,7 @@ import flash.text.Font;
         {
 			auto name = entry.name;
             auto fullName = std.path.join( currentRootDir, name );
-            if ( std.file.isfile( fullName ) )
+            if ( std.file.isFile( fullName ) )
             {
                 auto ext = std.path.getExt( name );
                 
@@ -626,28 +619,7 @@ import flash.text.Font;
                     }
                 }
             }
-            //else if ( recursive && std.file.isdir( fullName ) )
-            //{
-            //    // Backup the current path, then add the branch on the end.  
-            //    auto temp = currentRootDir.idup;
-            //    currentRootDir = fullName;
-            //    
-            //    // Recurse into the next dir.
-            //    std.file.listdir( fullName, &checkAsset );
-            //    
-            //    // Clean up, and restore the path before we went on that tangent.
-            //    delete currentRootDir;
-            //    currentRootDir = temp;
-            //}
-            
-            return true;
         }
-        
-        //foreach( dir; rootdirs )
-        //{
-        //    currentRootDir = dir;
-        //    std.file.listdir( dir, &checkAsset );
-        //}
         
         writefln( "Assets unused: ");
         foreach( asset; assetsUnused )
@@ -668,32 +640,16 @@ bool contains( immutable string[] stringSet, string str )
     return false;
 }
 
-bool searchForAssetUsage( string srcFile, ref string[] assetsUsedList )
+string[] getAssetReferences( string srcFile )
 {
     auto code = cast(string)std.file.read( srcFile );
     auto assets = match( code, fileRegExp );
     auto newAssetsUsed = new string[0];
-    
+	
     foreach( asset; assets )
-    {
-        auto assetHit = asset.hit[7..$-1]; // Assets.whatever -> whatever
-        bool duplicate = false;
-        foreach( assetUsed; assetsUsedList )
-        {
-            if ( std.string.cmp( assetHit, assetUsed ) == 0 )
-                duplicate = true;
-        }
-        if ( !duplicate )
-            newAssetsUsed ~= assetHit;
-    }
+        newAssetsUsed ~= asset.hit[7..$-1]; // Assets.whatever -> whatever
     
-    delete code;
-    
-    assetsUsedList ~= newAssetsUsed;
-    if ( newAssetsUsed.length > 0 )
-      return true;
-    
-    return false;
+    return newAssetsUsed;
 }
 
 void printUsage()
