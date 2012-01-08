@@ -4,49 +4,56 @@ import std.file;
 import std.path;
 import std.conv;
 import std.string;
+import std.array;
 import std.stdio;
 import std.process;
-import std.thread;
-import std.regexp;
-import std.perf;
+import std.regex;
+import std.datetime;
+import std.parallelism;
 
 const char[] defaultArgs = " -default-size 800 600";
 
-const char[][] assetExts =
-[
-"swf a!!!", // this is gone
+string[] assetExts;
+//immutable char[][] assetExts =
+//[
+//"swf", // this is gone
+//
+//// some sorta vector graphic format
+//"svg",
+//
+//// image types
+//"jpg",
+//"jpeg",
+//"png",
+//"gif",
+//
+//// sound files
+//"mp3",
+//
+//// font file(s)
+//"ttf",
+//];
 
-// some sorta vector graphic format
-"svg",
+immutable string[] swfExts = ["swf"];
+immutable string[] imageExts = ["svg"];
+immutable string[] soundExts = ["jpg","jpeg","png","gif"];
+immutable string[] fontExts = ["ttf"];
 
-// image types
-"jpg",
-"jpeg",
-"png",
-"gif",
-
-// sound files
-"mp3",
-
-// font file(s)
-"ttf",
-];
-
-char[][] swfExts;
-char[][] imageExts;
-char[][] soundExts;
-char[][] fontExts;
-
-static RegExp fileRegExp;
+static Regex!char fileRegExp;
 
 static this()
 {
-    swfExts = assetExts[0..1];
-    imageExts = assetExts[2..6];
-    soundExts = assetExts[6..7];
-    fontExts = assetExts[7..8];
+    //swfExts = assetExts[0..1].dup;
+    //imageExts = assetExts[2..6];
+    //soundExts = assetExts[6..7];
+    //fontExts = assetExts[7..8];
+	assetExts = new string[0];
+	assetExts ~= swfExts;
+	assetExts ~= imageExts;
+	assetExts ~= soundExts;
+	assetExts ~= fontExts;
     
-    fileRegExp = new RegExp( "Assets[.][_A-Za-z].*?[^_A-Za-z0-9]", "g" );
+    fileRegExp = Regex!char( "Assets[.][_A-Za-z].*?[^_A-Za-z0-9]", "g" );
 }
 
 enum // extension type
@@ -57,7 +64,7 @@ enum // extension type
     FONT
 }
 
-uint extType( char[] extension )
+uint extType( string extension )
 {
     if ( extension[0] is '.' )
         extension = extension[1..$];
@@ -73,20 +80,22 @@ uint extType( char[] extension )
     
     if ( fontExts.contains( extension ) )
         return FONT;
+	
+	assert(0);
 }
 
-int main( char[][] args )
+int main( string[] args )
 {
     // if this ever needs optimizing, 
     // linked lists would probably be much faster for some of this stuff
-    char[][] srcFiles = new char[][0];
-    char[][] assetFiles = new char[][0];
-    char[][] assetsUsed = new char[][0];
-    char[][] rootdirs = new char[][1]; // one for the cwd
-    char[][] passedArgs = new char[][0];
-    char[] cwd = std.file.getcwd();
-    char[] mainDir = cwd;
-    char[] resultName = null;
+    auto srcFiles = new string[0];
+    auto rootdirs = new string[1]; // one for the cwd
+    auto assetFiles = new string[0];
+    auto passedArgs = new string[0];
+    auto assetsUsed = new string[0];
+    auto cwd = std.file.getcwd();
+    auto mainDir = cwd;
+    string resultName = null;
     bool showUnused = false; // show which files aren't embedded by a3
     bool explicitResultName = false;
     /+uint xRes = 800;
@@ -113,7 +122,7 @@ int main( char[][] args )
                        //   following the current argument
     for (int i = 0; i < args.length; i++ )
     {
-        char[] arg = args[i];
+        auto arg = args[i];
         
         if ( skip )
         {
@@ -122,9 +131,9 @@ int main( char[][] args )
         }
         
         version ( Windows )
-          char[] tempArg = std.string.replace( arg, "/", "\\" );
+          auto tempArg = std.array.replace( arg, "/", "\\" );
         else
-          char[] tempArg = std.string.replace( arg, "\\", "/" );
+          auto tempArg = std.array.replace( arg, "\\", "/" );
         
         if ( std.file.exists( tempArg ) &&
             std.string.icmp( "as", std.path.getExt( tempArg ) ) == 0 )
@@ -140,8 +149,8 @@ int main( char[][] args )
                 //   entry file.
                 // If the guess is wrong, the -output switch should catch
                 //   it.  
-                char[] temp = std.path.getBaseName( tempArg );
-                char[] extension = std.path.getExt( temp );
+                auto temp = std.path.getBaseName( tempArg );
+                auto extension = std.path.getExt( temp );
                 if ( extension is null )
                     extension.length = 0;
                 temp = temp[0..$ - extension.length]; // chop off the extension
@@ -192,7 +201,7 @@ int main( char[][] args )
                 while ( j < args.length - 1 )
                 {
                     j++;
-                    char[] dirName = args[j];
+                    auto dirName = args[j];
                     
                     // Make sure it really is a directory.  
                     if ( !std.file.exists( dirName ) || 
@@ -244,20 +253,24 @@ int main( char[][] args )
     // Recurse through directories while looking for .as, .png, .jpg, 
     //  .mp3, and .swf files.
     //---------------------------------------------------------------------
-    char[] currentRootDir;
+    string currentRootDir;
     
-    bool checkFile( char[] name )
+    //bool checkFile( string name )
+	
+	foreach(dir; rootdirs)
+	foreach(entry; std.parallelism.parallel(std.file.dirEntries( dir, SpanMode.depth)) )
     {
-        char[] fullName = std.path.join( currentRootDir, name );
+		auto name = entry.name;
+        auto fullName = std.path.join( currentRootDir, name );
         if ( std.file.isfile( fullName ) )
         {
-            char[] ext = std.path.getExt( name );
+            auto ext = std.path.getExt( name );
             
             // Qoutes are put around fullName if there is a space in 
             //   there that the OS or program might not be able to handle. 
-            char[] enQouteIfSpace( char[] input )
+            string enQouteIfSpace( string input )
             {
-                if ( std.string.find( input, ' ' ) > -1  )
+                if ( std.string.indexOf( input, ' ' ) > -1  )
                     return '"' ~ input ~ '"';
                 else
                     return input;
@@ -285,57 +298,58 @@ int main( char[][] args )
                     break;
             }
         }
-        else if ( recursive && std.file.isdir( fullName ) )
-        {
-            // Backup the current path, then add the branch on the end.  
-            char[] temp = currentRootDir.dup;
-            currentRootDir = fullName;
-            
-            // Recurse into the next dir.
-            std.file.listdir( fullName, &checkFile );
-            
-            // Clean up, and restore the path before we went on that tangent.
-            delete currentRootDir;
-            currentRootDir = temp;
-        }
+        //else if ( recursive && std.file.isdir( fullName ) )
+        //{
+        //    // Backup the current path, then add the branch on the end.  
+        //    auto temp = currentRootDir.idup;
+        //    currentRootDir = fullName;
+        //    
+        //    // Recurse into the next dir.
+        //    std.file.listdir( fullName, &checkFile );
+        //    
+        //    // Clean up, and restore the path before we went on that tangent.
+        //    delete currentRootDir;
+        //    currentRootDir = temp;
+        //}
         
         return true; // Continue to the next file.  
     }
     
-    foreach( dir; rootdirs )
-    {
-        currentRootDir = dir;
-        std.file.listdir( dir, &checkFile );
-    }
+    //foreach( dir; rootdirs )
+    //{
+    //    currentRootDir = dir;
+    //    std.file.listdir( dir, &checkFile );
+    //}
     
     //---------------------------------------------------------------------
     // Generate assets class
     //---------------------------------------------------------------------
     
-    char[] assetFile = std.path.join( mainDir, "Assets.as" );
-    auto nameCorrectnessRegex = new RegExp("[^_a-zA-Z0-9]");
+    auto assetFile = std.path.join( mainDir, "Assets.as" );
+    auto nameCorrectnessRegex = Regex!char("[^_a-zA-Z0-9]");
     
+    const nl = std.string.newline;
     //char[] initBody = new char[0];
-    char[] assets = new char[0];
-    char[] nl = std.string.newline;
-    char[][] pastIDs = new char[][0];
+    auto assets = new char[0];
+    auto pastIDs = new string[0];
     
     foreach( asset; assetFiles )
     {
-        char[] idname = std.path.getBaseName( asset );
+        auto idname = std.path.getBaseName( asset );
         
         // We don't want to include previous builds into this build.
         if ( std.string.icmp( idname, resultName ) == 0 )
             continue;
         //
         
-        char[] extension = std.path.getExt( idname );
+        auto extension = std.path.getExt( idname );
         //writefln( extension );
         if ( extension is null )
             extension.length = 0;
         idname = idname[0..$ - (extension.length+1)]; // chop off the extension
         
-        if ( nameCorrectnessRegex.find( idname ) >= 0 )
+		auto m = match( idname, nameCorrectnessRegex);
+        if ( m.empty )
             throw new Error( "Asset file " ~ nl ~ asset ~ nl ~
                 "with name \""~idname~
                 "\" does not have a valid name." ~ nl ~
@@ -374,7 +388,7 @@ int main( char[][] args )
         
         // prep for the step afterwards - it just makes sure we have an absolute view
         //   of the main entry point directory
-        char[] absMainDir = mainDir;
+        auto absMainDir = mainDir;
         if ( cwd !is mainDir )
             absMainDir = std.path.join( cwd, mainDir );
         
@@ -383,8 +397,8 @@ int main( char[][] args )
         {
             // suppose absMainDir = tempDir = "C:\asprojects\game\src\stable"
             // also suppose cwd = "C:\asprojects\game"
-            char[] tempDir = absMainDir;
-            char[] backtrack = "";
+            auto tempDir = absMainDir;
+            auto backtrack = "";
             
             // if the entry point dir is longer than the cwd, we may need to backtrack to get
             //   to where the asset is.  
@@ -423,7 +437,7 @@ int main( char[][] args )
         // the path seperators on windows become escape sequences...
         //   this can be defeated by replacing \ with \\ so that mxmlc actually
         //   sees the path seperators instead of escape characters.  
-        char[] temp = new char[0];
+        auto temp = new char[0];
         foreach( dchar c; asset )
         {
             if ( c == '\\' )
@@ -431,7 +445,7 @@ int main( char[][] args )
             else
                 temp ~= c;
         }
-        asset = temp;
+        asset = temp.idup;
         
         // Add the embed tag.  
         if ( std.string.icmp( extension, "ttf" ) == 0 )
@@ -474,7 +488,7 @@ int main( char[][] args )
         }+/
     }
     
-    char[] initializer = std.string.format
+    auto initializer = std.string.format
     (
         `
         public static function init(_root:Sprite) : void
@@ -484,7 +498,7 @@ int main( char[][] args )
         //,initBody
     );
     
-    char[] assetClass = std.string.format
+    auto assetClass = std.string.format
     (
 `package {
 
@@ -515,7 +529,7 @@ import flash.text.Font;
     
     if ( compile )
     {
-        char[] mxmlcArgs = new char[0];
+        auto mxmlcArgs = "";
         
         foreach( arg; passedArgs )
             mxmlcArgs ~= " " ~ arg;
@@ -526,14 +540,14 @@ import flash.text.Font;
         
         debug writefln( "Compiling with args " ~ mxmlcArgs );
         
-        auto timer = new std.perf.PerformanceCounter();
+        std.datetime.StopWatch timer;
         
         timer.start();
         // For some reason std.process.execvp would make this app exit early.  
         int exitStatus = std.process.system( "mxmlc" ~ mxmlcArgs );
         
         timer.stop();
-        writefln( "Compilation took ", timer.microseconds," microseconds." );
+        writefln( "Compilation took ", timer.peek.usecs," microseconds." );
         
         if ( exitStatus != 0 )
             return exitStatus;
@@ -570,20 +584,23 @@ import flash.text.Font;
     
     if ( showUnused )
     {
-        char[][] assetsUnused = new char[][0];
+        shared assetsUnused = cast(shared)(new string[0]);
         
-        bool checkAsset( char[] name )
+        //bool checkAsset( string name )
+		foreach(dir; rootdirs)
+		foreach(entry; std.parallelism.parallel(std.file.dirEntries( dir, SpanMode.depth)) )
         {
-            char[] fullName = std.path.join( currentRootDir, name );
+			auto name = entry.name;
+            auto fullName = std.path.join( currentRootDir, name );
             if ( std.file.isfile( fullName ) )
             {
-                char[] ext = std.path.getExt( name );
+                auto ext = std.path.getExt( name );
                 
                 // Qoutes are put around fullName if there is a space in 
                 //   there that the OS or program might not be able to handle. 
-                char[] enQouteIfSpace( char[] input )
+                string enQouteIfSpace( string input )
                 {
-                    if ( std.string.find( input, ' ' ) > -1  )
+                    if ( std.string.indexOf( input, ' ' ) > -1  )
                         return '"' ~ input ~ '"';
                     else
                         return input;
@@ -597,7 +614,7 @@ import flash.text.Font;
                         bool isUsed = false;
                         foreach( usedAsset; assetsUsed )
                         {
-                            char[] idname = std.path.getBaseName( name );
+                            auto idname = std.path.getBaseName( name );
                             idname = idname[0..$ - (assetExt.length+1)];
                             
                             if ( std.string.icmp( idname, usedAsset ) == 0 )
@@ -609,28 +626,28 @@ import flash.text.Font;
                     }
                 }
             }
-            else if ( recursive && std.file.isdir( fullName ) )
-            {
-                // Backup the current path, then add the branch on the end.  
-                char[] temp = currentRootDir.dup;
-                currentRootDir = fullName;
-                
-                // Recurse into the next dir.
-                std.file.listdir( fullName, &checkAsset );
-                
-                // Clean up, and restore the path before we went on that tangent.
-                delete currentRootDir;
-                currentRootDir = temp;
-            }
+            //else if ( recursive && std.file.isdir( fullName ) )
+            //{
+            //    // Backup the current path, then add the branch on the end.  
+            //    auto temp = currentRootDir.idup;
+            //    currentRootDir = fullName;
+            //    
+            //    // Recurse into the next dir.
+            //    std.file.listdir( fullName, &checkAsset );
+            //    
+            //    // Clean up, and restore the path before we went on that tangent.
+            //    delete currentRootDir;
+            //    currentRootDir = temp;
+            //}
             
             return true;
         }
         
-        foreach( dir; rootdirs )
-        {
-            currentRootDir = dir;
-            std.file.listdir( dir, &checkAsset );
-        }
+        //foreach( dir; rootdirs )
+        //{
+        //    currentRootDir = dir;
+        //    std.file.listdir( dir, &checkAsset );
+        //}
         
         writefln( "Assets unused: ");
         foreach( asset; assetsUnused )
@@ -642,32 +659,32 @@ import flash.text.Font;
     return 0;
 }
 
-bool contains( char[][] stringSet, char[] string )
+bool contains( immutable string[] stringSet, string str )
 {
     foreach( subString; stringSet )
-        if ( std.string.icmp( subString, string ) == 0 )
+        if ( std.string.icmp( subString, str ) == 0 )
             return true;
     
     return false;
 }
 
-bool searchForAssetUsage( char[] srcFile, inout char[][] assetsUsedList )
+bool searchForAssetUsage( string srcFile, ref string[] assetsUsedList )
 {
-    char[] code = cast(char[])std.file.read( srcFile );
-    char[][] assets = fileRegExp.match(code);
-    char[][] newAssetsUsed = new char[][0];
+    auto code = cast(string)std.file.read( srcFile );
+    auto assets = match( code, fileRegExp );
+    auto newAssetsUsed = new string[0];
     
     foreach( asset; assets )
     {
-        asset = asset[7..$-1]; // Assets.whatever -> whatever
+        auto assetHit = asset.hit[7..$-1]; // Assets.whatever -> whatever
         bool duplicate = false;
         foreach( assetUsed; assetsUsedList )
         {
-            if ( std.string.cmp( asset, assetUsed ) == 0 )
+            if ( std.string.cmp( assetHit, assetUsed ) == 0 )
                 duplicate = true;
         }
         if ( !duplicate )
-            newAssetsUsed ~= asset.dup;
+            newAssetsUsed ~= assetHit;
     }
     
     delete code;
