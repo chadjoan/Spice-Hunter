@@ -2,3 +2,5 @@ mtasc
 swfmill*
 *.swp
 *.swf
+game/rawAssets
+game/src/Assets.as
