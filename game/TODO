@@ -1,0 +1,31 @@
+Porting necessities:
+- SWF file size.  It is 35MB, which is quite a wait for a flash game. 
+	- Check with flash portals on the recommended way of dealing with this.  Probably a good first step.
+	- This may involve rewriting the asset loading code to be able to load things in the order of when they are needed, and make the game playable as early as possible.
+	- Another approach may be more aggressive compression of assets.  I remember music being a big offender.
+- SWF file consolidation.  Spice Hunter is required to run from a RomLoader.SWF file.  We will probably need to get to the point where everything is handled from a single .SWF. 
+	- Again, it might be best to check with the portals themselves before spending considerable effort on something like this.
+- Possibly show some gamepad links when the game plays.  This is mostly just to inform people of how to hook up controllers to use the game, since flash doesn't do this for you.
+- Pause button could use more visual indication than a mere stoppage of motion.
+	- It should gray out and say "paused" at least.
+	- Perhaps this is a good place to show a summary of each player's key mappings?
+	- Maybe also a place to show a cheat-sheet of what can/can't be tethered and what can/can't be attracted/repelled.
+- Mouse control?
+	- Probably player 1 only.
+	- Hard to map into direct reticle control.  You may need to make it move the reticle towards the mouse cursor, and visual feedback may need engineering.
+- The how-to dialog will need the joystick graphics replaced with keyboard graphics.
+	- Albeit challenging, the moments where the joystick graphics previously moved
+	  to show the relationship to game actions should instead highlight the keys
+	  on the keyboard graphics with some indication of which player has which
+	  set of keys.
+- High scores tracking on teh internets.
+	- If the flash portals don't want to help with this (or don't MANDATE helping with this) then we do it on dreamhost.
+
+General improvements:
+- Fix the crash if you can find it!
+- Make beam color depend on ship color.  (Smallish procedural graphics tweak.  Might be super easy, might not.)
+- Reticle/Cursor visibility increase.
+	- Cursors are drawn procedurally.  In realtime too, IIRC.
+	- I believe cursor appearance changes with reticle upgrade level.
+	- This fix will probably involve procedural graphics coding to complete elegantly.
+	- This was brought up by Bobby.  I forget what the problem actually was.
