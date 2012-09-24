@@ -2,5 +2,14 @@ mtasc
 swfmill*
 *.swp
 *.swf
-game/rawAssets
+rawAssets
 game/src/Assets.as
+megacrush
+crunch-read-only
+crush
+dxt
+flare06linux64.tgz
+game/crunch
+images-dds
+images-red
+images.orig
