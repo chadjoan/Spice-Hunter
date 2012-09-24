@@ -1,8 +1,20 @@
 Porting necessities:
 - SWF file size.  It is 35MB, which is quite a wait for a flash game. 
 	- Check with flash portals on the recommended way of dealing with this.  Probably a good first step.
+		- Kongregate: 20MB
+		- Newgrounds: 10MB (negotiable)
+		- ArmorGames: No limit?
+		- Mochi Media: No limit? Multi-file.
+		- Potentiaries:
+			- Chrome Web store
+			- Facebook
+			- G+
 	- This may involve rewriting the asset loading code to be able to load things in the order of when they are needed, and make the game playable as early as possible.
 	- Another approach may be more aggressive compression of assets.  I remember music being a big offender.
+		- Images.  mxmlc "recompresses" png images to raw 32-bit(?) bitmap(!!!?).  The only saving grace in this debacle is the final swf gets zlibbed.
+		- Consequnce of the above is 15MB of highly-compressed, optimised PNG assets becomes 24MB of Aww Hell No.
+			- Investigating building the asset library with haxe
+			- A couple more MB can be saved if I use DXT compression where appropriate.
 - SWF file consolidation.  Spice Hunter is required to run from a RomLoader.SWF file.  We will probably need to get to the point where everything is handled from a single .SWF. 
 	- Again, it might be best to check with the portals themselves before spending considerable effort on something like this.
 - Possibly show some gamepad links when the game plays.  This is mostly just to inform people of how to hook up controllers to use the game, since flash doesn't do this for you.
