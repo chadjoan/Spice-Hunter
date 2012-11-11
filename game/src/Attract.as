@@ -34,7 +34,7 @@ public class Attract
   private var titlePlaying : Boolean;
   private var howToPlayPlaying : Boolean;
   
-  private var music:Sound = Assets.Music_Title;
+  private var music:Sound = Assets.m03;
   private var musicChannel:SoundChannel = new SoundChannel;
   
   private var previousFPS : Number;
