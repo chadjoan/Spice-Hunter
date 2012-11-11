@@ -116,7 +116,7 @@ public class Level_5 extends Level
     
     env.asteroidTrigger = 30.0;
     env.spiceTrigger = 5.0; 	
-    env.levelMusic  = Assets.m05;
+    env.levelMusic  = Assets.m0205;
   }
  
 

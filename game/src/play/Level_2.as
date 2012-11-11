@@ -71,7 +71,7 @@ public var AnchorAddY4 : Number;
     env.levelDuration = 188;
     env.asteroidTrigger = 50.0;   
     env.spiceTrigger = 5.0; 	 	
-    env.levelMusic  = Assets.m02;
+    env.levelMusic  = Assets.m0205;
 
     //setup variables that controll speed of anchors
     AnchorArrayX[0] = -.5;
