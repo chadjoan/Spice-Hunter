@@ -10,12 +10,12 @@ package com.pixeldroid.r_c4d3.tools.console {
 	import flash.text.TextFormatAlign;
 	import flash.ui.Keyboard;
 	import flash.utils.getTimer;
-	
+
 	/**
 	* <code>Console</code> implements a simple on screen display for viewing run-time text messages.
 	* New messages accumulate at the bottom of the console, old messages roll off the top.
 	*
-	* The console can be hidden, shown, paused, resumed, and cleared. Text in the console is selectable 
+	* The console can be hidden, shown, paused, resumed, and cleared. Text in the console is selectable
 	* so it can be copied to the clipboard.
 	*
 	* The buffer size is also configurable. As the buffer fills up, oldest lines are discarded first.
@@ -36,13 +36,13 @@ package com.pixeldroid.r_c4d3.tools.console {
 	*    }
 	* }
 	* </listing>
-	* 
+	*
 	* This class embeds a distributable font named "VeraMono.ttf" Copyright 2003 by Bitstream, Inc.
-	* 
+	*
 	* @see http://www.gnome.org/fonts/
 	*/
 	public class Console extends Sprite {
-		
+
 		[Embed(source="VeraMono.ttf", fontName="FONT_CONSOLE")]
 		private static var FONT_CONSOLE:Class;
 
@@ -53,17 +53,17 @@ package com.pixeldroid.r_c4d3.tools.console {
 		private static const FONT_SIZE:Number = 10;
 		private static const BACK_ALPHA:Number = .6;
 		private static const BUFFER_SIZE:int = 64;
-		
+
 		private static var background:Shape;
 		private static var console:TextField;
-		
+
 		private var loggingPaused:Boolean;
 		private var first:Boolean;
 		private var bufferMax:int;
-	
+
 		/**
 		* Create a new Console with optional parameters.
-		* 
+		*
 		* @param left Left edge of console (pixels)
 		* @param top Top edge of console (pixels)
 		* @param width Width of console (pixels)
@@ -77,16 +77,16 @@ package com.pixeldroid.r_c4d3.tools.console {
 		public function Console (
 			width:Number = WIDTH,
 			height:Number = HEIGHT,
-			bgColor:uint = BACK_COLOR, 
+			bgColor:uint = BACK_COLOR,
 			fgColor:uint = FORE_COLOR,
 			txtSize:Number = FONT_SIZE,
 			bgAlpha:Number = BACK_ALPHA,
 			buffer:int = BUFFER_SIZE
 		) {
 			super();
-			
+
 			addEventListener(Event.ADDED_TO_STAGE, registerKeyhandler);
-		
+
 			background = new Shape();
 			background.graphics.beginFill(bgColor, bgAlpha);
 			background.graphics.drawRect(0, 0, width, height);
@@ -98,7 +98,7 @@ package com.pixeldroid.r_c4d3.tools.console {
 			format.color = fgColor;
 			format.size = txtSize;
 			format.align = TextFormatAlign.LEFT;
-			
+
 			console = new TextField();
 			console.defaultTextFormat = format;
 			console.embedFonts = true;
@@ -106,16 +106,16 @@ package com.pixeldroid.r_c4d3.tools.console {
 			console.selectable = true;
 			console.wordWrap = true;
 			addChild(console);
-			
+
 			console.width = width;
 			console.height = height;
-			
+
 			loggingPaused = false;
 			first = true;
 			bufferMax = buffer;
 		}
-		
-		
+
+
 
 
 		/**
@@ -129,16 +129,16 @@ package com.pixeldroid.r_c4d3.tools.console {
 				console.scrollV = console.maxScrollV;
 			}
 		}
-	
-	
+
+
 		/**
 		* Clear all messages from the console.
 		*/
 		public function clear():void {
 			console.replaceText(0, console.length, "");
 		}
-	
-	
+
+
 		/**
 		* Pause the console. Messages received while paused are ignored.
 		*/
@@ -146,8 +146,8 @@ package com.pixeldroid.r_c4d3.tools.console {
 			out("<PAUSE>");
 			loggingPaused = true;
 		}
-	
-	
+
+
 		/**
 		* Resume the console.
 		*/
@@ -155,16 +155,16 @@ package com.pixeldroid.r_c4d3.tools.console {
 			loggingPaused = false;
 			out("<RESUME>");
 		}
-	
-	
+
+
 		/**
 		* Hide the console. Messages are still received.
 		*/
 		public function hide():void {
 			visible = false;
 		}
-	
-	
+
+
 		/**
 		* Show the console.
 		*/
@@ -172,7 +172,7 @@ package com.pixeldroid.r_c4d3.tools.console {
 			visible = true;
 		}
 
-		
+
 		private function registerKeyhandler(e:Event):void {
 			out(": : : : : : : : : : : : : :");
 			out(": tick (`) toggles hide   :");
@@ -181,7 +181,7 @@ package com.pixeldroid.r_c4d3.tools.console {
 			out("");
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler);
 		}
-		
+
 		private function keyDownHandler(e:KeyboardEvent):void {
 			if ("`" == String.fromCharCode(e.charCode)) {
 				if (e.ctrlKey == true) { toggleLog(); }
@@ -191,16 +191,16 @@ package com.pixeldroid.r_c4d3.tools.console {
 				clear();
 			}
 		}
-		
+
 		private function toggleLog():void { (loggingPaused == true) ? resume() : pause(); }
-		
+
 		private function toggleVis():void { (visible == false) ? show() : hide(); }
-		
+
 		private static function pad(s:String, p:uint = 8):String {
 			while(s.length < p) { s = "0" +s; }
 			return s;
 		}
-		
+
 	}
 
 }

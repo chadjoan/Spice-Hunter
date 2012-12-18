@@ -5,7 +5,7 @@ import flash.events.Event;
 /**
 * This class emulates functionality provided by an old version of R-C4D3.
 * It is Spice Hunter specific.
-* 
+*
 * <code>ControlEvent</code> objects are dispatched in response to user input through the R-C4D3 joysticks and buttons.
 * There are sixteen types of control events for each player:
 * <em>press</em> and <em>release</em> for each of the four joystick directions and the four buttons.

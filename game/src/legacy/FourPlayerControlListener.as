@@ -10,7 +10,7 @@ import legacy.FourPlayerControl;
 /**
 * This class emulates functionality provided by an old version of R-C4D3.
 * It is Spice Hunter specific.
-* 
+*
 * <code>FourPlayerControlListener</code> encapsulates the event hookups to <code>FourPlayerControl</code>,
 * to provide a convenient base class for control integration.
 *

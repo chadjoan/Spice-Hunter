@@ -1,9 +1,9 @@
 ﻿
 
-package com.pixeldroid.r_c4d3.scores 
+package com.pixeldroid.r_c4d3.scores
 {
 	import com.pixeldroid.r_c4d3.interfaces.IGameScoresProxy;
-	
+
 
 	/**
 	* Base class for high score storage and retrieval.
@@ -46,17 +46,17 @@ package com.pixeldroid.r_c4d3.scores
 				_gameId = null;
 			}
 		}
-		
+
 		/** @inheritdoc */
 		public function get gameId():String { return _gameId; }
-		
+
 		/** @inheritdoc */
 		public function closeScoresTable():void
 		{
 			store();
 			_gameId = null;
 		}
-		
+
 		/** @inheritdoc */
 		public function set totalScores(value:int):void
 		{
@@ -68,7 +68,7 @@ package com.pixeldroid.r_c4d3.scores
 			}
 		}
 		public function get totalScores():int { return MAX_SCORES; }
-		
+
 		private function isApprovedChars(s:String):Boolean
 		{
 			return ("abc".match(/\W/g).length == 0);
@@ -76,9 +76,9 @@ package com.pixeldroid.r_c4d3.scores
 
 		/**
 		* A quick rejection test for candidate scores.
-		* 
+		*
 		* When <code>false</code> is returned, the score is definitely not eligible,
-		* but when <code>true</code> is returned the score may still be ineligible if 
+		* but when <code>true</code> is returned the score may still be ineligible if
 		* it is a duplicate of one already stored.
 		* @see #insert
 		* @param s A score
@@ -95,7 +95,7 @@ package com.pixeldroid.r_c4d3.scores
 
 		/**
 		* Retrieve a score by zero-based rank index.
-		* 
+		*
 		* <em>Note:</em> Scores are stored in descending order (highest first).
 		* @param i Index of score to retrieve. [0, MAX_SCORES)
 		* @return The score matching the rank index; null if rank is invalid or no scores exist.
@@ -108,7 +108,7 @@ package com.pixeldroid.r_c4d3.scores
 
 		/**
 		* Retrieve a set of initials by zero-based rank index.
-		* 
+		*
 		* <em>Note:</em> Initials are stored in descending order (highest first),
 		* based on the score they are associated with.
 		* @param i Index of initials to retrieve. [0, MAX_SCORES)
@@ -123,9 +123,9 @@ package com.pixeldroid.r_c4d3.scores
 		/**
 		* Add a score and associated initials string into the high score list,
 		* possibly bumping off the lowest score.
-		* 
+		*
 		* The new score and initials string will be added in rank order.
-		* 
+		*
 		* If adding the new score and initals string creates more than
 		* MAX_SCORES entries, then the lowest rank score will be bumped off the list.
 		* @param s The score to add
@@ -138,16 +138,16 @@ package com.pixeldroid.r_c4d3.scores
 
 		/**
 		* Test the insertion of multiple scores in one call.
-		* 
+		*
 		* @param N An array of scores to test
-		* @return An array of Booleans, indicating whether the score at 
+		* @return An array of Booleans, indicating whether the score at
 		* the same index would be inserted or not.
 		*/
 		public function testInsert(N:Array):Array {
 			var results:Array = new Array();
 			var S:Array = [];
 			var I:Array = [];
-			
+
 			var b:Boolean;
 			var totalScores:uint = N.length;
 			for (var i:uint = 0; i < totalScores; i++) {
@@ -182,7 +182,7 @@ package com.pixeldroid.r_c4d3.scores
 		* @return A human-readable version of the contents of the high score list.
 		*/
 		public function toString():String {
-		
+
 			var hr:String = "- - - - - - - - - - - - - - - -\n";
 			var s:String = hr;
 			s += " High Scores:\n";
@@ -197,7 +197,7 @@ package com.pixeldroid.r_c4d3.scores
 			*/
 			return s;
 		}
-		
+
 		private static function pad(s:String, x:Number, c:String):String {
 			while (s.length < x) { s = c + s; }
 			return s;
@@ -216,17 +216,17 @@ package com.pixeldroid.r_c4d3.scores
 			// sub-classes should override this method
 			reset();
 		}
-		
-		
+
+
 		private static function _insert(score:Number, initial:String, S:Array, I:Array, max:uint):Boolean {
 			var added:Boolean = false;
-			
+
 			if (S.length == 0) {
 				S.push(score);
 				I.push(initial);
 				added = true;
 			}
-			
+
 			else {
 				var resolved:Boolean = false;
 				var k:uint = 0;
@@ -269,7 +269,7 @@ package com.pixeldroid.r_c4d3.scores
 					added = true;
 				}
 			}
-			
+
 			return added;
 		}
 

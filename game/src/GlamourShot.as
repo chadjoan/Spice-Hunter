@@ -8,30 +8,30 @@ public class GlamourShot extends Sprite
   private var tetherLayer : Bitmap;
   private var rightArmLayer : Bitmap;
   private var bodyLayer : Bitmap;
-  private var leftArmLayer : Bitmap;  
+  private var leftArmLayer : Bitmap;
   private var reticleLayer : Bitmap;
   private var gBombLayer : Bitmap;
-  	
+
   public function GlamourShot (owner:ShipSpec, scale : Number)
-    {    
-    build(owner,scale);	
+    {
+    build(owner,scale);
     }
-  
+
   private function unbuild () : void
     {
-    removeChild (tetherLayer);	
+    removeChild (tetherLayer);
     removeChild (rightArmLayer);
     removeChild (bodyLayer);
     removeChild (leftArmLayer);
     removeChild (reticleLayer);
     }
-  
+
   private function build(owner:ShipSpec, scale : Number) : void
     {
-    // Insert tether layer.	    
+    // Insert tether layer.
     switch (owner.tetherLevel)
-      {   
-      case 0:   
+      {
+      case 0:
       case 1: tetherLayer = new Assets.Tether1; break;
       case 2: tetherLayer = new Assets.Tether2; break;
       case 3: tetherLayer = new Assets.Tether3; break;
@@ -42,17 +42,17 @@ public class GlamourShot extends Sprite
       case 8: tetherLayer = new Assets.Tether8; break;
       case 9: tetherLayer = new Assets.Tether9; break;
       case 10: tetherLayer = new Assets.Tether10; break;
-      }    
-    
+      }
+
     tetherLayer.scaleX = scale;
     tetherLayer.scaleY = scale;
-    Utility.center (tetherLayer);       
-    addChild(tetherLayer);      
-    
+    Utility.center (tetherLayer);
+    addChild(tetherLayer);
+
     // Insert right arm layer.
     switch (owner.gravityLevel)
       {
-      case 0:   
+      case 0:
       case 1: rightArmLayer = new Assets.RightArmPowerup1; break;
       case 2: rightArmLayer = new Assets.RightArmPowerup2; break;
       case 3: rightArmLayer = new Assets.RightArmPowerup3; break;
@@ -62,14 +62,14 @@ public class GlamourShot extends Sprite
       case 7: rightArmLayer = new Assets.RightArmPowerup7; break;
       case 8: rightArmLayer = new Assets.RightArmPowerup8; break;
       case 9: rightArmLayer = new Assets.RightArmPowerup9; break;
-      case 10: rightArmLayer = new Assets.RightArmPowerup10; break;	
+      case 10: rightArmLayer = new Assets.RightArmPowerup10; break;
       }
-      
+
     rightArmLayer.scaleX = scale;
     rightArmLayer.scaleY = scale;
-    Utility.center (rightArmLayer);   
+    Utility.center (rightArmLayer);
     addChild (rightArmLayer);
-        
+
     // Insert body layer - 16 possibilites (4 shapes by 4 colors)
     switch (owner.teamCode)
       {
@@ -81,7 +81,7 @@ public class GlamourShot extends Sprite
       	  case 2: bodyLayer = new Assets.RedSpiral; break;
       	  case 3: bodyLayer = new Assets.DonutRed; break;
       	  }
-      break; 	
+      break;
       case ShipSpec.BLUE_TEAM:
       	switch (owner.playerID)
       	  {
@@ -90,7 +90,7 @@ public class GlamourShot extends Sprite
       	  case 2: bodyLayer = new Assets.BlueSpiral; break;
       	  case 3: bodyLayer = new Assets.DonutBlue; break;
       	  }
-      break; 
+      break;
       case ShipSpec.GREEN_TEAM:
       	switch (owner.playerID)
       	  {
@@ -99,7 +99,7 @@ public class GlamourShot extends Sprite
       	  case 2: bodyLayer = new Assets.GreenSpiral; break;
       	  case 3: bodyLayer = new Assets.DonutGreen; break;
       	  }
-      break; 	
+      break;
       case ShipSpec.YELLOW_TEAM:
       	switch (owner.playerID)
       	  {
@@ -108,17 +108,17 @@ public class GlamourShot extends Sprite
       	  case 2: bodyLayer = new Assets.YellowSpiral; break;
       	  case 3: bodyLayer = new Assets.DonutYellow; break;
       	  }
-      break; 
+      break;
       }
     bodyLayer.scaleX = scale;
     bodyLayer.scaleY = scale;
-    Utility.center (bodyLayer);    
+    Utility.center (bodyLayer);
     addChild (bodyLayer);
-    
+
     // Insert left arm layer.
     switch (owner.repelLevel)
       {
-      case 0:   
+      case 0:
       case 1: leftArmLayer = new Assets.LeftArmPowerup1; break;
       case 2: leftArmLayer = new Assets.LeftArmPowerup2; break;
       case 3: leftArmLayer = new Assets.LeftArmPowerup3; break;
@@ -128,19 +128,19 @@ public class GlamourShot extends Sprite
       case 7: leftArmLayer = new Assets.LeftArmPowerup7; break;
       case 8: leftArmLayer = new Assets.LeftArmPowerup8; break;
       case 9: leftArmLayer = new Assets.LeftArmPowerup9; break;
-      case 10: leftArmLayer = new Assets.LeftArmPowerup10; break;	
+      case 10: leftArmLayer = new Assets.LeftArmPowerup10; break;
       }
-      
+
     leftArmLayer.scaleX = scale;
     leftArmLayer.scaleY = scale;
-    Utility.center (leftArmLayer);    
+    Utility.center (leftArmLayer);
     addChild (leftArmLayer);
-    
+
     // Insert reticle layer.
-    
+
     /*switch (owner.reticleLevel)
       {
-      case 0:	
+      case 0:
       case 1: reticleLayer = new Assets.ReticuleLevel1; break;
       case 2: reticleLayer = new Assets.ReticuleLevel2; break;
       case 3: reticleLayer = new Assets.ReticuleLevel3; break;
@@ -150,15 +150,15 @@ public class GlamourShot extends Sprite
       case 7: reticleLayer = new Assets.ReticuleLevel7; break;
       case 8: reticleLayer = new Assets.ReticuleLevel8; break;
       case 9: reticleLayer = new Assets.ReticuleLevel9; break;
-      case 10: reticleLayer = new Assets.ReticuleLevel10; break;	
+      case 10: reticleLayer = new Assets.ReticuleLevel10; break;
       }*/
-    
+
     switch (owner.playerID)
      	{
      	case 0:
      	  switch (owner.reticleLevel)
      	    {
-          case 0:	
+          case 0:
           case 1: reticleLayer = new Assets.player1reticule01; break;
           case 2: reticleLayer = new Assets.player1reticule02; break;
           case 3: reticleLayer = new Assets.player1reticule03; break;
@@ -174,7 +174,7 @@ public class GlamourShot extends Sprite
      	case 1:
      	  switch (owner.reticleLevel)
      	    {
-          case 0:	
+          case 0:
           case 1: reticleLayer = new Assets.player2reticule01; break;
           case 2: reticleLayer = new Assets.player2reticule02; break;
           case 3: reticleLayer = new Assets.player2reticule03; break;
@@ -190,7 +190,7 @@ public class GlamourShot extends Sprite
      	case 2:
      	  switch (owner.reticleLevel)
      	    {
-          case 0:	
+          case 0:
           case 1: reticleLayer = new Assets.player3reticule01; break;
           case 2: reticleLayer = new Assets.player3reticule02; break;
           case 3: reticleLayer = new Assets.player3reticule03; break;
@@ -206,7 +206,7 @@ public class GlamourShot extends Sprite
      	case 3:
      	  switch (owner.reticleLevel)
      	    {
-          case 0:	
+          case 0:
           case 1: reticleLayer = new Assets.player4reticule01; break;
           case 2: reticleLayer = new Assets.player4reticule02; break;
           case 3: reticleLayer = new Assets.player4reticule03; break;
@@ -220,14 +220,14 @@ public class GlamourShot extends Sprite
      	    }
      	  break;
      	}
-    
-    Utility.center (reticleLayer);    
+
+    Utility.center (reticleLayer);
     // Apply color tint.
-    reticleLayer.bitmapData.colorTransform(reticleLayer.bitmapData.rect, Screen.getColorTransform (owner.teamCode))    
+    reticleLayer.bitmapData.colorTransform(reticleLayer.bitmapData.rect, Screen.getColorTransform (owner.teamCode))
     addChild (reticleLayer);
-    
-    
-    // Gravity bomb layer.  
+
+
+    // Gravity bomb layer.
     switch(owner.shieldLevel)
       {
       case 0:
@@ -242,23 +242,23 @@ public class GlamourShot extends Sprite
       case 9: gBombLayer = new Assets.bomb8; break;
       case 10: gBombLayer = new Assets.bomb9; break;
       }
-    
+
     gBombLayer.scaleX = scale;
     gBombLayer.scaleY = scale;
-    Utility.center (gBombLayer);    
+    Utility.center (gBombLayer);
     // Apply color tint.
-    gBombLayer.bitmapData.colorTransform(gBombLayer.bitmapData.rect, Screen.getColorTransform (owner.teamCode))    
+    gBombLayer.bitmapData.colorTransform(gBombLayer.bitmapData.rect, Screen.getColorTransform (owner.teamCode))
     addChild (gBombLayer);
-    
+
     }
-  
+
   public function refresh(owner:ShipSpec, scale:Number) : void
     // Regenerates a glamour shot with new art. Call this after the owner shipspec has changed.
     {
     unbuild();
-    build(owner, scale);	
+    build(owner, scale);
     }
-  
+
   }
 
 }

@@ -180,7 +180,7 @@ public class PlayerControlListener extends Sprite
 
     // HACK: We just leave the keyCode be its default value,
     //   since we don't actually know what it should be.
-    
+
     return event;
     }
 

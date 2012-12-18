@@ -7,10 +7,10 @@ import flash.display.Bitmap;
 import flash.display.BitmapData;
 
 public class SpiceGlob extends Animation
-  {  
+  {
   public static var globFrames : Array;
   public static var initialized : Boolean = false;
-    
+
   public static function init() : void
     {
     globFrames = new Array(10);
@@ -26,13 +26,13 @@ public class SpiceGlob extends Animation
     globFrames[9] = new Assets.SpaceSpiceCollision10;
     initialized = true;
     }
-   
+
   public function SpiceGlob ()
     {
     if ( !initialized )
       init();
-    
-    super();   
+
+    super();
     frames = globFrames;
     duration = 10;  // 1 second duration - this variable measured in 1/25ths of a second.
     }

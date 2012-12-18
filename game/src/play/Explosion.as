@@ -6,10 +6,10 @@ import flash.display.Sprite;
 import flash.display.Bitmap;
 
 public class Explosion extends Animation
-  {  
+  {
   public static var explFrames : Array;
   public static var initialized : Boolean = false;
-  
+
   public static function init() : void
     {
     explFrames = new Array(10);
@@ -25,7 +25,7 @@ public class Explosion extends Animation
     explFrames[9] = new Assets.explode10;
     initialized = true;
     }
-  
+
   public function Explosion ()
     {
     if ( !initialized )

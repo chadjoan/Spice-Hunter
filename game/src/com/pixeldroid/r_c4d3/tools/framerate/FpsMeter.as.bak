@@ -1,6 +1,6 @@
 
 package com.pixeldroid.r_c4d3.tools.framerate {
-	
+
 	import flash.display.Shape;
 	import flash.display.Sprite;
 	import flash.events.Event;
@@ -10,20 +10,20 @@ package com.pixeldroid.r_c4d3.tools.framerate {
 	import flash.text.TextFormatAlign;
 	import flash.utils.getTimer;
 	import flash.utils.Timer;
-	
-	
+
+
 	/**
 	* <code>FpsMeter</code> monitors frame rate. It graphs timed averages against a target rate.
-	* 
+	*
 	* This class embeds a distributable font named "PixelHugger.ttf" Copyright pixelhugger.com.
-	* 
+	*
 	* @see http://www.pixelhugger.com/fonts.php
 	*/
 	public class FpsMeter extends Sprite {
-		
+
 		[Embed(source="PixelHugger.ttf", fontName="FONT")]
 		private static var FONT:Class;
-		
+
 		private static const NUM_METERS:uint = 3;
 		private static const UPDATE_INTERVAL:uint = 250;
 		private static const frameCounts:Array = [0,0,0];
@@ -38,20 +38,20 @@ package com.pixeldroid.r_c4d3.tools.framerate {
 		private var targetFps:Number;
 		private var UPDATE_INTERVAL:int;
 		private var updateTimer:Timer;
-		
+
 		private var targetLine:Shape;
 		private var meterShadowContainer:Sprite;
 		private var meterContainer:Sprite;
 
 
-		
+
 		/**
 		* Create a new <code>FpsMeter</code>.
 		* Default target framerate of 30fps and interval meters averaging 1, 5, and 9 second frame counts will be created.
 		* These can be changed with <code>setFpsTarget</code> and <code>setFpsInterval</code>.
-		* 
+		*
 		* Monitoring starts when you call <code>startMonitoring()</code>
-		* 
+		*
 		* @see #setFpsTarget
 		* @see #setFpsInterval
 		*/
@@ -59,30 +59,30 @@ package com.pixeldroid.r_c4d3.tools.framerate {
 			timeCheckHandlers[0] = timeCheck1;
 			timeCheckHandlers[1] = timeCheck2;
 			timeCheckHandlers[2] = timeCheck3;
-			
+
 			buildParts();
-			
+
 			setFpsTarget(30);
 			setFpsInterval(0, 1);
 			setFpsInterval(1, 5);
 			setFpsInterval(2, 9);
 		}
-		
-		
+
+
 		/**
 		* Set the target frame rate threshold.
 		* When actual frame rates dip below the target, the meters will turn from black to red.
-		* 
+		*
 		* @param t Target frame rate, in frames per second
 		*/
 		public function setFpsTarget(t:Number):void {
 			targetLine.x = targetFps = Math.max(1, Math.min(99, t));
 		}
-		
+
 		/**
 		* Set the update interval for one of the three frame rate meters.
 		* Each meter displays a frame rate average over its given interval.
-		* 
+		*
 		* @param which Zero-based meter index (0,1,2)
 		* @param seconds Interval duration
 		*/
@@ -94,7 +94,7 @@ package com.pixeldroid.r_c4d3.tools.framerate {
 				timeCheckIntervals[which] = seconds*1000;
 			}
 		}
-		
+
 		/**
 		* Activate frame rate monitoring.
 		*/
@@ -109,7 +109,7 @@ package com.pixeldroid.r_c4d3.tools.framerate {
 				timeCheckTimers[i].start();
 			}
 		}
-		
+
 		/**
 		* Terminate frame rate monitoring.
 		*/
@@ -121,29 +121,29 @@ package com.pixeldroid.r_c4d3.tools.framerate {
 				timeCheckTimers[i].removeEventListener(TimerEvent.TIMER, timeCheckHandlers[i]);
 			}
 		}
-		
-		
-		
+
+
+
 		private function buildParts():void {
 			buildMeterShadows()
 			buildMeters();
-			
+
 			targetLine = new Shape();
 			targetLine.graphics.beginFill(0x00ff00);
 			targetLine.graphics.drawRect(0,0, 1,27);
 			targetLine.graphics.endFill();
 			meterContainer.addChild(targetLine);
-			
+
 			var format:TextFormat = new TextFormat();
 			format.font = "FONT";
 			format.color = 0x000000;
 			format.size = 9;
 			format.align = TextFormatAlign.LEFT;
-			
+
 			buildLabels(format);
 			buildDisplays(format);
 		}
-		
+
 		private function buildMeterShadows():void {
 			meterShadowContainer = new Sprite();
 			var s:Shape;
@@ -158,7 +158,7 @@ package com.pixeldroid.r_c4d3.tools.framerate {
 			meterShadowContainer.x = 12;
 			addChild(meterShadowContainer);
 		}
-		
+
 		private function buildMeters():void {
 			meterContainer = new Sprite();
 			for (var i:uint = 0; i < NUM_METERS; i++) {
@@ -172,7 +172,7 @@ package com.pixeldroid.r_c4d3.tools.framerate {
 			meterContainer.x = 12;
 			addChild(meterContainer);
 		}
-		
+
 		private function buildLabels(format:TextFormat):void {
 			for (var i:uint = 0; i < NUM_METERS; i++) {
 				labels[i] = new TextField();
@@ -186,7 +186,7 @@ package com.pixeldroid.r_c4d3.tools.framerate {
 				addChild(labels[i]);
 			}
 		}
-		
+
 		private function buildDisplays(format:TextFormat):void {
 			for (var i:uint = 0; i < NUM_METERS; i++) {
 				displays[i] = new TextField();
@@ -201,7 +201,7 @@ package com.pixeldroid.r_c4d3.tools.framerate {
 				addChild(displays[i]);
 			}
 		}
-		
+
 		private function fillBar(bar:Shape, color:uint):void {
 			var w:Number = bar.width;
 			var h:Number = bar.height;
@@ -210,7 +210,7 @@ package com.pixeldroid.r_c4d3.tools.framerate {
 			bar.graphics.drawRect(0,0, w,h);
 			bar.graphics.endFill();
 		}
-		
+
 		private function update(e:TimerEvent):void {
 			var t:Number = getTimer();
 			for (var which:uint = 0; which < NUM_METERS; which++) {
@@ -222,13 +222,13 @@ package com.pixeldroid.r_c4d3.tools.framerate {
 				displays[which].x = v + 12;
 			}
 		}
-		
+
 		private function countFrame(e:Event):void {
 			for (var i:uint = 0; i < NUM_METERS; i++) {
 				frameCounts[i]++;
 			}
 		}
-		
+
 		private function timeCheck(which:uint):void {
 			var t:Number = getTimer();
 			timeChecks[which] = t;

@@ -12,7 +12,7 @@ import flash.display.Sprite;
 public class DummyMapNode extends Body
   {
   public function DummyMapNode (_x : Number,_y : Number)
-    {     
+    {
     // Initialize Particle members.
     super();
     rx = _x;
@@ -20,18 +20,18 @@ public class DummyMapNode extends Body
     vx = 0;
     vy = 0;
     mass = 1;
-    
+
     // Initialize Body members.
     omega = 0;
-    phi = 0;    
-    collision_radius = 2;        
-    moment = mass*collision_radius*collision_radius;      
+    phi = 0;
+    collision_radius = 2;
+    moment = mass*collision_radius*collision_radius;
     }
-    
-  
-  
-  
-    
+
+
+
+
+
   }
-  
+
 } // end of package.

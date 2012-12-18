@@ -74,4 +74,3 @@ public class FPSDisplay implements IDrawable
   }
   
 } // end of package.
-  

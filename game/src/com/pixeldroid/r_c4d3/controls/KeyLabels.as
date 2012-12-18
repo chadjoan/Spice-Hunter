@@ -6,8 +6,8 @@ package com.pixeldroid.r_c4d3.controls
 	Provides human readable labels for keys that can be looked up by keycode.
 	*/
 	public class KeyLabels {
-		
-		
+
+
 		private static const UNDEFINED:String = "unknown key";
 		private static const LABELS:Array = [
 			UNDEFINED, /* 0 */
@@ -167,25 +167,25 @@ package com.pixeldroid.r_c4d3.controls
 			UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED,
 			UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED,
 			UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED, UNDEFINED,
-			UNDEFINED, 
-			UNDEFINED, 
+			UNDEFINED,
+			UNDEFINED,
 			"LEFT BRACE", /* 219 */
 			"BACK SLASH",
 			"RIGHT BRACE",
 			"SINGLE QUOTE"
 		];
-		
+
 		/**
 		Get a human readable label for the key with the assigned <code>keyCode</code>.
 		@param keyCode number assigned to keyboard key by flash,
 		probably obtained from <code>KeyboardEvent.keyCode</code>
 		@return string label describing key represented by keyCode
 		*/
-		public static function getLabel(keyCode:uint):String 
+		public static function getLabel(keyCode:uint):String
 		{
 			return (keyCode < LABELS.length) ? LABELS[int(keyCode)] : UNDEFINED;
 		}
-		
+
 	}
-	
+
 }
