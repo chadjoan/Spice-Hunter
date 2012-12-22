@@ -2,6 +2,7 @@ package play
 {
 
 import Assets;
+import Screen;
 import play.Controls;
 import play.Level;
 import play.Ship;
@@ -13,6 +14,13 @@ import flash.events.KeyboardEvent;
 import flash.display.Sprite;
 import flash.display.Bitmap;
 import flash.media.Sound;
+
+import flash.filters.BitmapFilter; // For Pause stuff
+import flash.filters.ColorMatrixFilter;
+import flash.geom.ColorTransform;
+import flash.geom.Point;
+import flash.text.TextField;
+import flash.text.TextFormat;
 
 public class Environment
   {
@@ -67,6 +75,18 @@ public class Environment
   private var level : Level;          // Extensible class for implementing different levels.
 
   private var paused : Boolean = false;
+  private static var r : Number = 0.212671;
+  private static var g : Number = 0.715160;
+  private static var b : Number = 0.072169;
+  private static var desat : ColorMatrixFilter = new ColorMatrixFilter(
+                       [r, g, b, 0, -32,
+                        r, g, b, 0, -32,
+                        r, g, b, 0, -16,
+                        0, 0, 0, 1, 0]);
+  private static const pString : String = "PAUSED";
+  private static var pFormat : TextFormat = new TextFormat("title",64,0xFFFFFF,null,null,null,null,null,"center")
+  private var tf : TextField = new TextField();
+  private var sprite : Sprite = Screen.swfs;
 
   // Constructs a new game environment. Accepts an array of ship specifications as input.
   public function Environment (_shipspecs:Array, round : Number )
@@ -245,6 +265,14 @@ public class Environment
     fpsDisplay = new FPSDisplay();
     gameClock = null;
 
+    // Pause Text
+    tf.embedFonts = true;
+    tf.x = 0;
+    tf.y = Screen.height/3;
+    tf.width = 800
+    tf.text = pString;
+    tf.setTextFormat( pFormat );
+
     // Profiler setup
     totalTimeProfiler.y  = 0;
     vmTimeProfiler.y     = 30;
@@ -271,6 +299,8 @@ public class Environment
   // Listen for the pause key.
   private function onKeyUp( e : KeyboardEvent ) : void
     {
+    if (paused) // If this is true, we're unpausing...
+      sprite.removeChild(tf); // ...so stop displaying text, please.
     if ( e.keyCode == 19 )
       {
       paused = !paused;
@@ -298,7 +328,6 @@ public class Environment
 
     if ( !paused )
       {
-
       logicTimeProfiler.startBench();
 
       var deltaT : Number = 25.0 / fpsDisplay.FPS;
@@ -402,11 +431,10 @@ public class Environment
       updateTethers(deltaT);
       }
       else {
-        //Draw something on the screen related to PAUSE
-        //And grey it all out, too?
+        // Pausing desaturates the screen and prints some text.
+        Screen.backbuffer.bitmapData.applyFilter(Screen.backbuffer.bitmapData, Screen.rect, new Point(0,0),desat)
+        sprite.addChild( tf );
       }
-
-    // if ( !paused )
 
     gameTimeProfiler.endBench();
     vmTimeProfiler.startBench();

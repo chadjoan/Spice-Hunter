@@ -19,7 +19,7 @@ public class Screen
   
   public static var root : Sprite;
   
-  private static var backbuffer : Bitmap;
+  public static var backbuffer : Bitmap;
   
   // drawing queue
   private static var drawQueue : Array; // array of drawing operations to be performed.
@@ -281,5 +281,4 @@ public class Screen
     } 
  
   } // class Screen
-
 }
